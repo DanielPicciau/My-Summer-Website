@@ -203,6 +203,43 @@
         box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); /* Blue glow on focus */
     }
 
+    /* Notification styling */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--card-dark);
+      color: var(--text-primary);
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-left: 4px solid var(--primary);
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--primary);
+    }
+    
+    .notification-close {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
     /* Responsive adjustments for floating clock on smaller screens */
     @media (max-width: 1024px) {
       .floating-clock {
@@ -218,6 +255,13 @@
   <div class="floating-clock">
     <i class="fas fa-clock"></i>
     <span id="live-clock" class="clock-time">00:00:00</span>
+  </div>
+  
+  <!-- Notification Container -->
+  <div id="notification" class="notification">
+    <button class="notification-close">&times;</button>
+    <div class="notification-title" id="notification-title">Notification</div>
+    <div id="notification-message">Message content goes here</div>
   </div>
   
   <!-- Main content area with max width and horizontal padding -->
@@ -369,6 +413,47 @@
   </footer>
 
   <script>
+    // Notification System
+    const notification = {
+      element: document.getElementById('notification'),
+      title: document.getElementById('notification-title'),
+      message: document.getElementById('notification-message'),
+      closeBtn: document.querySelector('.notification-close'),
+      lastTaskId: null,
+      
+      init: function() {
+        this.closeBtn.addEventListener('click', () => this.hide());
+      },
+      
+      show: function(title, message, duration = 5000) {
+        this.title.textContent = title;
+        this.message.textContent = message;
+        this.element.classList.add('show');
+        
+        if (duration > 0) {
+          setTimeout(() => this.hide(), duration);
+        }
+      },
+      
+      hide: function() {
+        this.element.classList.remove('show');
+      },
+      
+      sendTaskNotification: function(task) {
+        if (this.lastTaskId !== task.id) {
+          this.lastTaskId = task.id;
+          const title = `Time for: ${task.task}`;
+          const message = `From ${task.start} to ${task.end}`;
+          this.show(title, message);
+          
+          // Send push notification if API is available
+          if (window.Notification && Notification.permission === 'granted') {
+            new Notification(title, { body: message });
+          }
+        }
+      }
+    };
+
     // Schedule Data - now includes a 'day' property for easier mapping and 'duration' for calculations
     const scheduleData = {
       Monday: [
@@ -703,7 +788,12 @@
             taskStart = taskStartMinutes;
             taskEnd = taskEndMinutes;
             // Calculate progress within the current task
-            taskProgress = Math.min(100, Math.max(0, ((currentMinutes - taskStart) / (taskEnd - taskStart)) * 100));
+            taskProgress = Math.min(100, Math.max(0, ((currentMinutes - taskStart) / (taskEnd - taskStart)) * 100);
+            
+            // Send notification for new task
+            if (notification.lastTaskId !== task.id) {
+              notification.sendTaskNotification(task);
+            }
             
             // Collect next 3 upcoming tasks (excluding free time/leisure)
             for (let j = i + 1; j < tasksToday.length && upcomingTasks.length < 3; j++) {
@@ -778,6 +868,16 @@
 
     // Event listener for when the DOM is fully loaded
     document.addEventListener('DOMContentLoaded', () => {
+        // Initialize notification system
+        notification.init();
+        
+        // Request notification permission if not already granted
+        if (window.Notification && Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                console.log("Notification permission:", permission);
+            });
+        }
+        
         initializeSchedule(); // Render tasks and set up checkboxes
         updateLiveClock(); // Initial display of the live clock
         updateCurrentTaskAndFocus(); // Initial update of current task and focus section
@@ -792,6 +892,52 @@
       card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
       card.style.opacity = '0'; /* Start with opacity 0 for fadeIn animation */
     });
+
+    // Push Notification API Integration
+    const pushNotificationApiKey = 'acdwyq6voywdmw2dt1dnu4jgjui7jr';
+    const pushNotificationUserId = 'u5cz4j61ut3qz3ehbh4gzo9dnwg423';
+
+    /**
+     * Sends a push notification to the user's device
+     * @param {string} title - Notification title
+     * @param {string} message - Notification message
+     */
+    function sendPushNotification(title, message) {
+      if (!navigator.serviceWorker) return;
+      
+      navigator.serviceWorker.ready.then(registration => {
+        registration.pushManager.getSubscription().then(subscription => {
+          if (!subscription) {
+            console.log('No push subscription available');
+            return;
+          }
+          
+          // In a real implementation, you would send this to your server
+          // which would then use the push API key to send the notification
+          console.log('Would send push notification:', { title, message });
+          
+          // For demo purposes, we'll just log it
+          fetch('https://api.example.com/push-notifications', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${pushNotificationApiKey}`
+            },
+            body: JSON.stringify({
+              userId: pushNotificationUserId,
+              subscription,
+              notification: { title, message }
+            })
+          }).then(response => {
+            if (!response.ok) {
+              console.error('Failed to send push notification');
+            }
+          }).catch(error => {
+            console.error('Error sending push notification:', error);
+          });
+        });
+      });
+    }
   </script>
 </body>
 </html>
