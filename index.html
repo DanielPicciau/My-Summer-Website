@@ -8,31 +8,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
+    /* Define CSS variables for consistent theming */
     :root {
-      --primary: #38bdf8;
-      --primary-dark: #0ea5e9;
-      --accent: #818cf8;
-      --bg-dark: #020617;
-      --card-dark: #0f172a;
-      --card-border: #1e293b;
-      --text-primary: #e2e8f0;
-      --text-secondary: #94a3b8;
+      --primary: #38bdf8; /* Sky Blue */
+      --primary-dark: #0ea5e9; /* Darker Sky Blue */
+      --accent: #818cf8; /* Indigo */
+      --bg-dark: #020617; /* Darkest Slate */
+      --card-dark: #0f172a; /* Dark Slate Blue */
+      --card-border: #1e293b; /* Lighter Slate Blue for borders */
+      --text-primary: #e2e8f0; /* Off-white for main text */
+      --text-secondary: #94a3b8; /* Lighter slate for secondary text */
     }
     
+    /* Basic reset for all elements */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
     
+    /* Body styling: font, background gradient, text color, min height for full page */
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, var(--bg-dark) 0%, #0c1226 100%);
       color: var(--text-primary);
       min-height: 100vh;
-      overflow-x: hidden;
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
     
+    /* Keyframe animations for fade-in and pulse effects */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -44,14 +48,16 @@
       100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
     }
     
+    /* Styling for the currently active task highlight */
     .current-task-highlight {
       position: relative;
       background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0) 100%) !important;
       border-left: 4px solid var(--primary) !important;
-      animation: pulse 2s infinite;
-      padding-left: 1.25rem;
+      animation: pulse 2s infinite; /* Pulsing effect for emphasis */
+      padding-left: 1.25rem; /* Adjust padding due to border */
     }
     
+    /* "NOW" label for the current task */
     .current-task-highlight::before {
       content: "NOW";
       position: absolute;
@@ -63,17 +69,19 @@
       font-size: 0.7rem;
       font-weight: 800;
       padding: 0.15rem 0.5rem;
-      border-radius: 9999px;
+      border-radius: 9999px; /* Pill shape */
     }
     
+    /* Styling for individual day cards */
     .day-card {
-      transition: all 0.3s ease;
+      transition: all 0.3s ease; /* Smooth transition for hover effects */
       border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.5);
+      box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.5); /* Soft shadow */
       position: relative;
       overflow: hidden;
     }
     
+    /* Gradient top border for day cards */
     .day-card::before {
       content: '';
       position: absolute;
@@ -84,11 +92,13 @@
       background: linear-gradient(90deg, var(--primary), var(--accent));
     }
     
+    /* Hover effect for day cards */
     .day-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px -10px rgba(2, 6, 23, 0.6);
+      transform: translateY(-5px); /* Lift effect */
+      box-shadow: 0 15px 35px -10px rgba(2, 6, 23, 0.6); /* Enhanced shadow */
     }
     
+    /* Status bar styling (note: original status bar was refactored into "Today's Focus") */
     .status-bar {
       background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(10px);
@@ -96,21 +106,12 @@
       box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
     }
     
+    /* Text glow effect */
     .glow-text {
       text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
-    
-    .time-indicator {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 2px;
-      background: var(--primary);
-      width: 0;
-      box-shadow: 0 0 10px 2px rgba(56, 189, 248, 0.7);
-      z-index: 20;
-    }
-    
+        
+    /* Progress bar styling */
     .progress-bar {
       height: 4px;
       background: rgba(56, 189, 248, 0.2);
@@ -118,13 +119,15 @@
       overflow: hidden;
     }
     
+    /* Progress fill inside the bar */
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--primary), var(--accent));
       width: 0%;
-      transition: width 0.5s ease;
+      transition: width 0.5s ease; /* Smooth width change */
     }
     
+    /* Floating clock styling (fixed position) */
     .floating-clock {
       position: fixed;
       top: 1rem;
@@ -137,21 +140,70 @@
       font-size: 1.5rem;
       font-weight: 700;
       box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
-      z-index: 100;
+      z-index: 100; /* Ensure it stays on top */
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
     
+    /* Icon styling within the floating clock */
     .floating-clock i {
       color: var(--primary);
       font-size: 1.25rem;
     }
     
+    /* Monospaced numbers for clock for consistent display */
     .clock-time {
       font-variant-numeric: tabular-nums;
     }
-    
+
+    /* Styling for completed tasks (line-through and faded) */
+    .task-completed {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+
+    /* Custom styling for checkboxes */
+    .task-checkbox {
+        margin-right: 0.75rem;
+        appearance: none; /* Hide default checkbox */
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid var(--primary);
+        border-radius: 0.375rem; /* rounded-md */
+        background-color: transparent;
+        transition: all 0.2s ease;
+        position: relative;
+        cursor: pointer;
+    }
+
+    /* Checked state for custom checkboxes */
+    .task-checkbox:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    /* Checkmark inside the custom checkbox when checked */
+    .task-checkbox:checked::before {
+        content: '\2713'; /* Unicode checkmark character */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 0.875rem; /* text-sm */
+        color: var(--bg-dark); /* Dark color for contrast */
+        font-weight: bold;
+    }
+
+    /* Focus state for accessibility */
+    .task-checkbox:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); /* Blue glow on focus */
+    }
+
+    /* Responsive adjustments for floating clock on smaller screens */
     @media (max-width: 1024px) {
       .floating-clock {
         top: auto;
@@ -162,505 +214,147 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
-  <!-- Floating Clock -->
+  <!-- Floating Clock displays current time -->
   <div class="floating-clock">
     <i class="fas fa-clock"></i>
     <span id="live-clock" class="clock-time">00:00:00</span>
   </div>
   
-  <!-- Main content area -->
+  <!-- Main content area with max width and horizontal padding -->
   <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
     <header class="text-center mb-10">
-      <!-- Status Bar -->
-      <div id="status-bar" class="status-bar mb-8 rounded-xl p-5 text-center max-w-4xl mx-auto">
-        <div class="text-2xl md:text-3xl font-bold mb-2">
-          <span class="text-sky-400">Hello Daniel</span>, 
-          <span id="current-day" class="text-purple-400">Monday</span>
-        </div>
-        <div class="text-lg md:text-xl flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4">
-          <span id="current-task" class="font-semibold text-slate-200">Loading current task...</span>
-          <span class="hidden md:block">•</span>
-          <span id="current-time" class="font-mono text-sky-400">00:00:00</span>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="progress-bar mt-4">
-          <div id="progress-fill" class="progress-fill"></div>
-        </div>
-      </div>
-      
+      <!-- Main title of the schedule -->
       <h1 class="text-4xl md:text-5xl font-extrabold mb-4 glow-text">
         <span class="bg-gradient-to-r from-sky-400 to-purple-500 bg-clip-text text-transparent">
-          Summer Development Plan
+          Daniel's Summer Development Plan
         </span>
       </h1>
+      <!-- Schedule date range -->
       <p class="text-slate-400 text-lg">
         <i class="fas fa-calendar mr-2"></i>June 10 – Sept 10, 2025
       </p>
     </header>
 
-    <!-- Responsive grid -->
+    <!-- Today's Focus Section (New) - centralizes current day's info -->
+    <section class="bg-card-dark rounded-xl p-6 mb-8 border border-card-border shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between">
+      <!-- Current Day and Date -->
+      <div class="mb-4 lg:mb-0 lg:w-1/3">
+        <h2 class="text-3xl font-bold text-sky-400 mb-2 flex items-center gap-3">
+          <i class="fas fa-calendar-day text-purple-400"></i>
+          <span id="today-focus-day">Loading Day...</span>
+        </h2>
+        <p class="text-slate-400 text-sm">
+          <span id="today-focus-date">Loading Date...</span>
+          <span class="font-mono ml-2 text-sky-300" id="today-focus-time">00:00:00</span>
+        </p>
+      </div>
+
+      <!-- Current Task and Progress -->
+      <div class="lg:w-1/3 mb-4 lg:mb-0">
+        <h3 class="text-xl font-semibold text-slate-200 mb-2 flex items-center gap-2">
+          <i class="fas fa-hourglass-half text-orange-400"></i>
+          Current Task:
+        </h3>
+        <p id="today-focus-current-task" class="text-lg text-slate-100 font-medium ml-6">
+          Loading current task...
+        </p>
+        <div class="progress-bar mt-2">
+          <div id="today-focus-progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Upcoming Tasks -->
+      <div class="lg:w-1/3">
+        <h3 class="text-xl font-semibold text-slate-200 mb-2 flex items-center gap-2">
+          <i class="fas fa-tasks text-green-400"></i>
+          Upcoming Tasks:
+        </h3>
+        <ul id="today-focus-upcoming-tasks" class="space-y-1 ml-6 text-slate-300 text-base">
+          <!-- Upcoming tasks will be loaded here by JS -->
+          <li>No upcoming tasks.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Missed Hours Summary (New) - displays analysis of forgotten study time -->
+    <section class="bg-card-dark rounded-xl p-6 mb-8 border border-card-border shadow-lg text-center">
+      <h2 class="text-2xl font-bold text-red-400 mb-3 flex items-center justify-center gap-3">
+        <i class="fas fa-stopwatch text-red-500"></i>
+        Missed Study Time Analysis
+      </h2>
+      <p id="missed-hours-summary" class="text-xl text-slate-100 mb-2">
+        You haven't missed any study time today! Keep up the great work.
+      </p>
+      <p id="missed-hours-impact" class="text-slate-400 text-sm">
+        <!-- Impact message will be populated here by JS -->
+      </p>
+    </section>
+
+    <!-- Responsive grid for daily schedule cards -->
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       <!-- Monday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="mon-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-sun text-yellow-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Monday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-mon-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">9:00–10:30</strong>
-              <span class="text-xs text-slate-500">90 min</span>
-            </div>
-            <div class="text-slate-300">Morning routine</div>
-          </li>
-          <li id="task-mon-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">10:30–12:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">HTML/CSS Study</div>
-          </li>
-          <li id="task-mon-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">12:30–13:30</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Lunch + Leisure</div>
-          </li>
-          <li id="task-mon-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">13:30–15:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Project: Webpage/Interface</div>
-          </li>
-          <li id="task-mon-4" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">15:30–16:00</strong>
-              <span class="text-xs text-slate-500">30 min</span>
-            </div>
-            <div class="text-slate-300">Short break</div>
-          </li>
-          <li id="task-mon-5" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">16:00–18:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Practice: CSS/JS</div>
-          </li>
-          <li id="task-mon-6" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">18:00–19:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Dinner</div>
-          </li>
-          <li id="task-mon-7" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">19:00–21:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Coursera (Frontend Module)</div>
-          </li>
-          <li id="task-mon-8" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">21:00–23:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Free time</div>
-          </li>
+        <ul class="space-y-4" id="monday-tasks">
+          <!-- Tasks will be populated by JS to include checkboxes -->
         </ul>
       </div>
 
       <!-- Tuesday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="tue-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-code text-purple-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Tuesday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-tue-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">9:00–10:30</strong>
-              <span class="text-xs text-slate-500">90 min</span>
-            </div>
-            <div class="text-slate-300">Morning routine</div>
-          </li>
-          <li id="task-tue-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">10:30–12:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Django Basics</div>
-          </li>
-          <li id="task-tue-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">12:30–13:30</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Lunch + Leisure</div>
-          </li>
-          <li id="task-tue-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">13:30–15:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Coding: Django Project</div>
-          </li>
-          <li id="task-tue-4" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">15:30–16:00</strong>
-              <span class="text-xs text-slate-500">30 min</span>
-            </div>
-            <div class="text-slate-300">Short break</div>
-          </li>
-          <li id="task-tue-5" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">16:00–18:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Continue: Add Functionality</div>
-          </li>
-          <li id="task-tue-6" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">18:00–19:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Dinner</div>
-          </li>
-          <li id="task-tue-7" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">19:00–21:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Assignments/Tutorials</div>
-          </li>
-          <li id="task-tue-8" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">21:00–23:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Free time</div>
-          </li>
-        </ul>
+        <ul class="space-y-4" id="tuesday-tasks"></ul>
       </div>
 
       <!-- Wednesday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="wed-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-chart-line text-green-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Wednesday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-wed-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">9:00–10:30</strong>
-              <span class="text-xs text-slate-500">90 min</span>
-            </div>
-            <div class="text-slate-300">Morning routine</div>
-          </li>
-          <li id="task-wed-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">10:30–12:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Pandas Fundamentals</div>
-          </li>
-          <li id="task-wed-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">12:30–13:30</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Lunch + Leisure</div>
-          </li>
-          <li id="task-wed-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">13:30–15:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Data Practice</div>
-          </li>
-          <li id="task-wed-4" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">15:30–16:00</strong>
-              <span class="text-xs text-slate-500">30 min</span>
-            </div>
-            <div class="text-slate-300">Short break</div>
-          </li>
-          <li id="task-wed-5" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">16:00–18:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Data Transformations</div>
-          </li>
-          <li id="task-wed-6" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">18:00–19:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Dinner</div>
-          </li>
-          <li id="task-wed-7" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">19:00–21:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Coursera Challenges</div>
-          </li>
-          <li id="task-wed-8" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">21:00–23:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Free time</div>
-          </li>
-        </ul>
+        <ul class="space-y-4" id="wednesday-tasks"></ul>
       </div>
 
       <!-- Thursday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="thu-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-brain text-indigo-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Thursday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-thu-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">9:00–10:30</strong>
-              <span class="text-xs text-slate-500">90 min</span>
-            </div>
-            <div class="text-slate-300">Morning routine</div>
-          </li>
-          <li id="task-thu-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">10:30–12:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Advanced Concepts</div>
-          </li>
-          <li id="task-thu-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">12:30–13:30</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Lunch + Leisure</div>
-          </li>
-          <li id="task-thu-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">13:30–15:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Apply Concepts in Code</div>
-          </li>
-          <li id="task-thu-4" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">15:30–16:00</strong>
-              <span class="text-xs text-slate-500">30 min</span>
-            </div>
-            <div class="text-slate-300">Short break</div>
-          </li>
-          <li id="task-thu-5" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">16:00–18:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Course Project Work</div>
-          </li>
-          <li id="task-thu-6" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">18:00–19:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Dinner</div>
-          </li>
-          <li id="task-thu-7" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">19:00–21:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Reinforce Learning</div>
-          </li>
-          <li id="task-thu-8" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">21:00–23:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Free time</div>
-          </li>
-        </ul>
+        <ul class="space-y-4" id="thursday-tasks"></ul>
       </div>
 
       <!-- Friday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="fri-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-rocket text-orange-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Friday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-fri-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">9:00–10:30</strong>
-              <span class="text-xs text-slate-500">90 min</span>
-            </div>
-            <div class="text-slate-300">Morning routine</div>
-          </li>
-          <li id="task-fri-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">10:30–12:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Project Planning</div>
-          </li>
-          <li id="task-fri-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">12:30–13:30</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Lunch + Leisure</div>
-          </li>
-          <li id="task-fri-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">13:30–15:30</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Project: Start Building</div>
-          </li>
-          <li id="task-fri-4" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">15:30–16:00</strong>
-              <span class="text-xs text-slate-500">30 min</span>
-            </div>
-            <div class="text-slate-300">Short break</div>
-          </li>
-          <li id="task-fri-5" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">16:00–18:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Features & Fixes</div>
-          </li>
-          <li id="task-fri-6" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">18:00–19:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Dinner</div>
-          </li>
-          <li id="task-fri-7" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">19:00–21:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Finalize/Review</div>
-          </li>
-          <li id="task-fri-8" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">21:00–23:00</strong>
-              <span class="text-xs text-slate-500">120 min</span>
-            </div>
-            <div class="text-slate-300">Free time</div>
-          </li>
-        </ul>
+        <ul class="space-y-4" id="friday-tasks"></ul>
       </div>
 
       <!-- Saturday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="sat-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-coffee text-amber-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Saturday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-sat-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">9:00–10:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Morning routine & Week Review</div>
-          </li>
-          <li id="task-sat-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">10:00–13:00</strong>
-              <span class="text-xs text-slate-500">180 min</span>
-            </div>
-            <div class="text-slate-300">Extended Project Work</div>
-          </li>
-          <li id="task-sat-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">13:00–14:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Lunch Break</div>
-          </li>
-          <li id="task-sat-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">14:00–17:00</strong>
-              <span class="text-xs text-slate-500">180 min</span>
-            </div>
-            <div class="text-slate-300">Skill Deep Dive / New Tech Exploration</div>
-          </li>
-          <li id="task-sat-4" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">17:00–18:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Physical Activity / Outdoors</div>
-          </li>
-          <li id="task-sat-5" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">18:00 onwards</strong>
-              <span class="text-xs text-slate-500">-</span>
-            </div>
-            <div class="text-slate-300">Free time / Social</div>
-          </li>
-        </ul>
+        <ul class="space-y-4" id="saturday-tasks"></ul>
       </div>
 
       <!-- Sunday -->
       <div class="day-card bg-card-dark rounded-xl p-6 relative">
-        <div class="time-indicator" id="sun-indicator"></div>
         <div class="flex items-center mb-4">
           <i class="fas fa-restroom text-cyan-400 mr-3 text-xl"></i>
           <h2 class="text-2xl font-bold text-sky-400">Sunday</h2>
         </div>
-        <ul class="space-y-4">
-          <li id="task-sun-0" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">Flexible</strong>
-              <span class="text-xs text-slate-500">-</span>
-            </div>
-            <div class="text-slate-300">Rest & Recharge</div>
-          </li>
-          <li id="task-sun-1" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">Afternoon</strong>
-              <span class="text-xs text-slate-500">-</span>
-            </div>
-            <div class="text-slate-300">Plan for Next Week</div>
-          </li>
-          <li id="task-sun-2" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">Evening</strong>
-              <span class="text-xs text-slate-500">-</span>
-            </div>
-            <div class="text-slate-300">Relaxing Activities / Hobbies</div>
-          </li>
-          <li id="task-sun-3" class="p-2 rounded-lg">
-            <div class="flex justify-between">
-              <strong class="text-slate-100">21:00–22:00</strong>
-              <span class="text-xs text-slate-500">60 min</span>
-            </div>
-            <div class="text-slate-300">Prepare for Monday</div>
-          </li>
-        </ul>
+        <ul class="space-y-4" id="sunday-tasks"></ul>
       </div>
     </section>
   </main>
@@ -675,105 +369,312 @@
   </footer>
 
   <script>
+    // Schedule Data - now includes a 'day' property for easier mapping and 'duration' for calculations
     const scheduleData = {
       Monday: [
-        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-mon-0" },
-        { start: "10:30", end: "12:30", task: "HTML/CSS Study", id: "task-mon-1" },
-        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-mon-2" },
-        { start: "13:30", end: "15:30", task: "Project: Webpage/Interface", id: "task-mon-3" },
-        { start: "15:30", end: "16:00", task: "Short break", id: "task-mon-4" },
-        { start: "16:00", end: "18:00", task: "Practice: CSS/JS", id: "task-mon-5" },
-        { start: "18:00", end: "19:00", task: "Dinner", id: "task-mon-6" },
-        { start: "19:00", end: "21:00", task: "Coursera (Frontend Module)", id: "task-mon-7" },
-        { start: "21:00", end: "23:59", task: "Free time", id: "task-mon-8" },
+        { day: "Monday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-mon-0" },
+        { day: "Monday", start: "10:30", end: "12:30", task: "HTML/CSS Study", duration: 120, id: "task-mon-1" },
+        { day: "Monday", start: "12:30", end: "13:30", task: "Lunch + Leisure", duration: 60, id: "task-mon-2" },
+        { day: "Monday", start: "13:30", end: "15:30", task: "Project: Webpage/Interface", duration: 120, id: "task-mon-3" },
+        { day: "Monday", start: "15:30", end: "16:00", task: "Short break", duration: 30, id: "task-mon-4" },
+        { day: "Monday", start: "16:00", end: "18:00", task: "Practice: CSS/JS", duration: 120, id: "task-mon-5" },
+        { day: "Monday", start: "18:00", end: "19:00", task: "Dinner", duration: 60, id: "task-mon-6" },
+        { day: "Monday", start: "19:00", end: "21:00", task: "Coursera (Frontend Module)", duration: 120, id: "task-mon-7" },
+        { day: "Monday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-mon-8" }, // Adjusted end to 23:59 for duration calculation
       ],
       Tuesday: [
-        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-tue-0" },
-        { start: "10:30", end: "12:30", task: "Django Basics", id: "task-tue-1" },
-        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-tue-2" },
-        { start: "13:30", end: "15:30", task: "Coding: Django Project", id: "task-tue-3" },
-        { start: "15:30", end: "16:00", task: "Short break", id: "task-tue-4" },
-        { start: "16:00", end: "18:00", task: "Continue: Add Functionality", id: "task-tue-5" },
-        { start: "18:00", end: "19:00", task: "Dinner", id: "task-tue-6" },
-        { start: "19:00", end: "21:00", task: "Assignments/Tutorials", id: "task-tue-7" },
-        { start: "21:00", end: "23:59", task: "Free time", id: "task-tue-8" },
+        { day: "Tuesday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-tue-0" },
+        { day: "Tuesday", start: "10:30", end: "12:30", task: "Django Basics", duration: 120, id: "task-tue-1" },
+        { day: "Tuesday", start: "12:30", end: "13:30", task: "Lunch + Leisure", duration: 60, id: "task-tue-2" },
+        { day: "Tuesday", start: "13:30", end: "15:30", task: "Coding: Django Project", duration: 120, id: "task-tue-3" },
+        { day: "Tuesday", start: "15:30", end: "16:00", task: "Short break", duration: 30, id: "task-tue-4" },
+        { day: "Tuesday", start: "16:00", end: "18:00", task: "Continue: Add Functionality", duration: 120, id: "task-tue-5" },
+        { day: "Tuesday", start: "18:00", end: "19:00", task: "Dinner", duration: 60, id: "task-tue-6" },
+        { day: "Tuesday", start: "19:00", end: "21:00", task: "Assignments/Tutorials", duration: 120, id: "task-tue-7" },
+        { day: "Tuesday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-tue-8" },
       ],
       Wednesday: [
-        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-wed-0" },
-        { start: "10:30", end: "12:30", task: "Pandas Fundamentals", id: "task-wed-1" },
-        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-wed-2" },
-        { start: "13:30", end: "15:30", task: "Data Practice", id: "task-wed-3" },
-        { start: "15:30", end: "16:00", task: "Short break", id: "task-wed-4" },
-        { start: "16:00", end: "18:00", task: "Data Transformations", id: "task-wed-5" },
-        { start: "18:00", end: "19:00", task: "Dinner", id: "task-wed-6" },
-        { start: "19:00", end: "21:00", task: "Coursera Challenges", id: "task-wed-7" },
-        { start: "21:00", end: "23:59", task: "Free time", id: "task-wed-8" },
+        { day: "Wednesday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-wed-0" },
+        { day: "Wednesday", start: "10:30", end: "12:30", task: "Pandas Fundamentals", duration: 120, id: "task-wed-1" },
+        { day: "Wednesday", start: "12:30", end: "13:30", task: "Lunch + Leisure", duration: 60, id: "task-wed-2" },
+        { day: "Wednesday", start: "13:30", end: "15:30", task: "Data Practice", duration: 120, id: "task-wed-3" },
+        { day: "Wednesday", start: "15:30", end: "16:00", task: "Short break", duration: 30, id: "task-wed-4" },
+        { day: "Wednesday", start: "16:00", end: "18:00", task: "Data Transformations", duration: 120, id: "task-wed-5" },
+        { day: "Wednesday", start: "18:00", end: "19:00", task: "Dinner", duration: 60, id: "task-wed-6" },
+        { day: "Wednesday", start: "19:00", end: "21:00", task: "Coursera Challenges", duration: 120, id: "task-wed-7" },
+        { day: "Wednesday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-wed-8" },
       ],
       Thursday: [
-        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-thu-0" },
-        { start: "10:30", end: "12:30", task: "Advanced Concepts", id: "task-thu-1" },
-        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-thu-2" },
-        { start: "13:30", end: "15:30", task: "Apply Concepts in Code", id: "task-thu-3" },
-        { start: "15:30", end: "16:00", task: "Short break", id: "task-thu-4" },
-        { start: "16:00", end: "18:00", task: "Course Project Work", id: "task-thu-5" },
-        { start: "18:00", end: "19:00", task: "Dinner", id: "task-thu-6" },
-        { start: "19:00", end: "21:00", task: "Reinforce Learning", id: "task-thu-7" },
-        { start: "21:00", end: "23:59", task: "Free time", id: "task-thu-8" },
+        { day: "Thursday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-thu-0" },
+        { day: "Thursday", start: "10:30", end: "12:30", task: "Advanced Concepts", duration: 120, id: "task-thu-1" },
+        { day: "Thursday", start: "12:30", end: "13:30", task: "Lunch + Leisure", duration: 60, id: "task-thu-2" },
+        { day: "Thursday", start: "13:30", end: "15:30", task: "Apply Concepts in Code", duration: 120, id: "task-thu-3" },
+        { day: "Thursday", start: "15:30", end: "16:00", task: "Short break", duration: 30, id: "task-thu-4" },
+        { day: "Thursday", start: "16:00", end: "18:00", task: "Course Project Work", duration: 120, id: "task-thu-5" },
+        { day: "Thursday", start: "18:00", end: "19:00", task: "Dinner", duration: 60, id: "task-thu-6" },
+        { day: "Thursday", start: "19:00", end: "21:00", task: "Reinforce Learning", duration: 120, id: "task-thu-7" },
+        { day: "Thursday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-thu-8" },
       ],
       Friday: [
-        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-fri-0" },
-        { start: "10:30", end: "12:30", task: "Project Planning", id: "task-fri-1" },
-        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-fri-2" },
-        { start: "13:30", end: "15:30", task: "Project: Start Building", id: "task-fri-3" },
-        { start: "15:30", end: "16:00", task: "Short break", id: "task-fri-4" },
-        { start: "16:00", end: "18:00", task: "Features & Fixes", id: "task-fri-5" },
-        { start: "18:00", end: "19:00", task: "Dinner", id: "task-fri-6" },
-        { start: "19:00", end: "21:00", task: "Finalize/Review", id: "task-fri-7" },
-        { start: "21:00", end: "23:59", task: "Free time", id: "task-fri-8" },
+        { day: "Friday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-fri-0" },
+        { day: "Friday", start: "10:30", end: "12:30", task: "Project Planning", duration: 120, id: "task-fri-1" },
+        { day: "Friday", start: "12:30", end: "13:30", task: "Lunch + Leisure", duration: 60, id: "task-fri-2" },
+        { day: "Friday", start: "13:30", end: "15:30", task: "Project: Start Building", duration: 120, id: "task-fri-3" },
+        { day: "Friday", start: "15:30", end: "16:00", task: "Short break", duration: 30, id: "task-fri-4" },
+        { day: "Friday", start: "16:00", end: "18:00", task: "Features & Fixes", duration: 120, id: "task-fri-5" },
+        { day: "Friday", start: "18:00", end: "19:00", task: "Dinner", duration: 60, id: "task-fri-6" },
+        { day: "Friday", start: "19:00", end: "21:00", task: "Finalize/Review", duration: 120, id: "task-fri-7" },
+        { day: "Friday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-fri-8" },
       ],
       Saturday: [
-        { start: "09:00", end: "10:00", task: "Morning routine & Week Review", id: "task-sat-0" },
-        { start: "10:00", end: "13:00", task: "Extended Project Work", id: "task-sat-1" },
-        { start: "13:00", end: "14:00", task: "Lunch Break", id: "task-sat-2" },
-        { start: "14:00", end: "17:00", task: "Skill Deep Dive / New Tech Exploration", id: "task-sat-3" },
-        { start: "17:00", end: "18:00", task: "Physical Activity / Outdoors", id: "task-sat-4" },
-        { start: "18:00", end: "23:59", task: "Free time / Social", id: "task-sat-5" },
+        { day: "Saturday", start: "09:00", end: "10:00", task: "Morning routine & Week Review", duration: 60, id: "task-sat-0" },
+        { day: "Saturday", start: "10:00", end: "13:00", task: "Extended Project Work", duration: 180, id: "task-sat-1" },
+        { day: "Saturday", start: "13:00", end: "14:00", task: "Lunch Break", duration: 60, id: "task-sat-2" },
+        { day: "Saturday", start: "14:00", end: "17:00", task: "Skill Deep Dive / New Tech Exploration", duration: 180, id: "task-sat-3" },
+        { day: "Saturday", start: "17:00", end: "18:00", task: "Physical Activity / Outdoors", duration: 60, id: "task-sat-4" },
+        { day: "Saturday", start: "18:00", end: "23:59", task: "Free time / Social", duration: 359, id: "task-sat-5" },
       ],
       Sunday: [
-        { start: "00:00", end: "12:59", task: "Rest & Recharge", id: "task-sun-0" },
-        { start: "13:00", end: "17:00", task: "Plan for Next Week", id: "task-sun-1" },
-        { start: "17:01", end: "20:59", task: "Relaxing Activities / Hobbies", id: "task-sun-2" },
-        { start: "21:00", end: "22:00", task: "Prepare for Monday", id: "task-sun-3" },
-        { start: "22:01", end: "23:59", task: "Rest & Recharge", id: "task-sun-4" }
+        { day: "Sunday", start: "00:00", end: "12:59", task: "Rest & Recharge", duration: 779, id: "task-sun-0" }, // Covers early morning to just before next task
+        { day: "Sunday", start: "13:00", end: "17:00", task: "Plan for Next Week", duration: 240, id: "task-sun-1" },
+        { day: "Sunday", start: "17:01", end: "20:59", task: "Relaxing Activities / Hobbies", duration: 238, id: "task-sun-2" },
+        { day: "Sunday", start: "21:00", end: "22:00", task: "Prepare for Monday", duration: 60, id: "task-sun-3" },
+        { day: "Sunday", start: "22:01", end: "23:59", task: "Rest & Recharge", duration: 118, id: "task-sun-4" } // Covers remaining time
       ],
     };
 
     // DOM Elements
-    const statusBar = document.getElementById('status-bar');
-    const currentTaskEl = document.getElementById('current-task');
-    const currentTimeEl = document.getElementById('current-time');
-    const currentDayEl = document.getElementById('current-day');
-    const progressFill = document.getElementById('progress-fill');
     const liveClock = document.getElementById('live-clock');
-    let currentlyHighlighted = null;
+    
+    // Today's Focus Section Elements
+    const todayFocusDayEl = document.getElementById('today-focus-day');
+    const todayFocusDateEl = document.getElementById('today-focus-date');
+    const todayFocusTimeEl = document.getElementById('today-focus-time');
+    const todayFocusCurrentTaskEl = document.getElementById('today-focus-current-task');
+    const todayFocusProgressFill = document.getElementById('today-focus-progress-fill');
+    const todayFocusUpcomingTasksEl = document.getElementById('today-focus-upcoming-tasks');
 
+    // Missed Hours Elements
+    const missedHoursSummaryEl = document.getElementById('missed-hours-summary');
+    const missedHoursImpactEl = document.getElementById('missed-hours-impact');
+
+    let currentlyHighlighted = null; // Stores the ID of the currently highlighted task element in the main schedule view
+
+    /**
+     * Converts a time string (e.g., "09:00") to minutes since midnight.
+     * @param {string} timeStr - The time string in "HH:MM" format.
+     * @returns {number} The total minutes from midnight.
+     */
     function timeToMinutes(timeStr) {
       const [hours, minutes] = timeStr.split(':').map(Number);
       return hours * 60 + minutes;
     }
 
+    /**
+     * Updates the live clock display in the floating clock and today's focus section.
+     */
     function updateLiveClock() {
       const now = new Date();
       const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       liveClock.textContent = timeString;
+      todayFocusTimeEl.textContent = timeString; // Also update in today's focus section
     }
 
-    function updateCurrentTask() {
+    /**
+     * Saves the completion status of a task to localStorage.
+     * After saving, it triggers an update of the missed hours summary.
+     * @param {string} taskId - The ID of the task.
+     * @param {boolean} isCompleted - True if the task is completed, false otherwise.
+     */
+    function saveTaskCompletion(taskId, isCompleted) {
+      const completionStatus = JSON.parse(localStorage.getItem('taskCompletion') || '{}');
+      completionStatus[taskId] = isCompleted;
+      localStorage.setItem('taskCompletion', JSON.stringify(completionStatus));
+      updateMissedHoursSummary(); // Recalculate and update summary after change
+    }
+
+    /**
+     * Loads the completion status of a task from localStorage.
+     * @param {string} taskId - The ID of the task.
+     * @returns {boolean} True if the task is completed, false by default.
+     */
+    function loadTaskCompletion(taskId) {
+      const completionStatus = JSON.parse(localStorage.getItem('taskCompletion') || '{}');
+      return completionStatus[taskId] || false;
+    }
+
+    /**
+     * Renders tasks for a given day into the appropriate UL element,
+     * including checkboxes and their initial states (completed/not completed).
+     * @param {string} dayName - The name of the day (e.g., "Monday").
+     * @param {Array<Object>} tasks - An array of task objects for the day.
+     */
+    function renderTasksForDay(dayName, tasks) {
+      const ulElement = document.getElementById(`${dayName.toLowerCase()}-tasks`);
+      if (!ulElement) {
+        console.error(`UL element for ${dayName} not found.`);
+        return;
+      }
+
+      ulElement.innerHTML = ''; // Clear existing tasks before rendering
+
+      tasks.forEach(task => {
+        const isCompleted = loadTaskCompletion(task.id);
+
+        const li = document.createElement('li');
+        li.id = task.id; // Assign ID to the list item for highlighting
+        // Apply 'task-completed' class if the task is marked as done
+        li.className = `p-2 rounded-lg flex items-start gap-2 ${isCompleted ? 'task-completed' : ''}`;
+
+        // Construct the inner HTML for each task item with a checkbox
+        li.innerHTML = `
+          <input type="checkbox" class="task-checkbox mt-1" id="checkbox-${task.id}" ${isCompleted ? 'checked' : ''}>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <strong class="text-slate-100">${task.start}–${task.end}</strong>
+              <span class="text-xs text-slate-500">${task.duration} min</span>
+            </div>
+            <div class="text-slate-300">${task.task}</div>
+          </div>
+        `;
+        
+        ulElement.appendChild(li);
+
+        // Add event listener to the newly created checkbox
+        const checkbox = document.getElementById(`checkbox-${task.id}`);
+        if (checkbox) {
+            checkbox.addEventListener('change', (event) => {
+                // Save the new completion status and update the UI
+                saveTaskCompletion(task.id, event.target.checked);
+                // Toggle 'task-completed' class on the parent li element
+                if (event.target.checked) {
+                    li.classList.add('task-completed');
+                } else {
+                    li.classList.remove('task-completed');
+                }
+            });
+        }
+      });
+    }
+
+    /**
+     * Calculates the total missed study hours based on unchecked tasks that have already passed.
+     * Filters out tasks explicitly marked as "Free time" or "Leisure".
+     * @returns {number} The total missed minutes from past or currently elapsed tasks.
+     */
+    function calculateMissedHours() {
+      let missedMinutes = 0;
+      const now = new Date();
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const currentDayIndex = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+      const currentMinutesOfDay = now.getHours() * 60 + now.getMinutes();
+
+      console.log(`--- Calculating Missed Hours (Current Time: ${now.toLocaleTimeString()}) ---`);
+      console.log(`Current Day Index: ${currentDayIndex} (${dayNames[currentDayIndex]})`);
+      console.log(`Current Minutes of Day: ${currentMinutesOfDay}`);
+
+      // Iterate through each day in the scheduleData
+      for (let i = 0; i < dayNames.length; i++) {
+        const dayName = dayNames[i];
+        const dayTasks = scheduleData[dayName];
+        
+        if (!dayTasks) continue; // Skip if no tasks for this day
+
+        console.log(`Checking tasks for ${dayName}:`);
+
+        // Case 1: Past days (any task not completed is missed)
+        if (i < currentDayIndex) {
+          dayTasks.forEach(task => {
+            // Exclude non-study tasks and tasks without duration
+            if (task.task.toLowerCase().includes("free time") || 
+                task.task.toLowerCase().includes("leisure") || 
+                task.duration === undefined) {
+              return; 
+            }
+            const isCompleted = loadTaskCompletion(task.id);
+            if (!isCompleted) {
+              missedMinutes += task.duration;
+              console.log(`  - MISSED (Past Day): ${task.task} (${task.duration} min). ID: ${task.id}, Completed: ${isCompleted}`);
+            } else {
+              console.log(`  - COMPLETED (Past Day): ${task.task}. ID: ${task.id}, Completed: ${isCompleted}`);
+            }
+          });
+        } 
+        // Case 2: Current day (only tasks whose end time has passed and are not completed are missed)
+        else if (i === currentDayIndex) {
+          dayTasks.forEach(task => {
+            const taskEndMinutes = timeToMinutes(task.end);
+            // Only consider tasks that have already ended on the current day
+            if (taskEndMinutes <= currentMinutesOfDay) {
+              // Exclude non-study tasks and tasks without duration
+              if (task.task.toLowerCase().includes("free time") || 
+                  task.task.toLowerCase().includes("leisure") || 
+                  task.duration === undefined) {
+                return; 
+              }
+              const isCompleted = loadTaskCompletion(task.id);
+              if (!isCompleted) {
+                missedMinutes += task.duration;
+                console.log(`  - MISSED (Current Day, Passed): ${task.task} (${task.duration} min). ID: ${task.id}, Completed: ${isCompleted}`);
+              } else {
+                console.log(`  - COMPLETED (Current Day, Passed): ${task.task}. ID: ${task.id}, Completed: ${isCompleted}`);
+              }
+            } else {
+                // Task is on current day but has not yet passed its end time
+                console.log(`  - UPCOMING (Current Day, Future): ${task.task} (Not counted). End Time: ${task.end}`);
+            }
+          });
+        }
+        // Case 3: Future days (no tasks from future days are considered missed)
+        else if (i > currentDayIndex) {
+            console.log(`  - FUTURE DAY: ${dayName} (Tasks not counted as missed yet).`);
+        }
+      }
+      console.log(`Total Missed Minutes: ${missedMinutes}`);
+      console.log(`--- End Missed Hours Calculation ---`);
+      return missedMinutes;
+    }
+
+    /**
+     * Updates the "Missed Study Time Analysis" section with the calculated missed hours
+     * and a personalized message about their potential impact.
+     */
+    function updateMissedHoursSummary() {
+      const totalMissedMinutes = calculateMissedHours();
+      const missedHours = Math.floor(totalMissedMinutes / 60);
+      const remainingMinutes = totalMissedMinutes % 60;
+
+      if (totalMissedMinutes === 0) {
+        missedHoursSummaryEl.textContent = "You haven't missed any study time! Keep up the great work.";
+        missedHoursImpactEl.textContent = ""; // Clear impact message if no hours missed
+      } else {
+        let timeString = '';
+        // Format the time string nicely (e.g., "2 hours and 30 minutes")
+        if (missedHours > 0) {
+            timeString += `${missedHours} hour${missedHours > 1 ? 's' : ''}`;
+        }
+        if (remainingMinutes > 0) {
+            if (timeString) timeString += ' and '; // Add "and" if both hours and minutes exist
+            timeString += `${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}`;
+        }
+        
+        missedHoursSummaryEl.textContent = `You have missed approximately ${timeString} of study time.`;
+        missedHoursImpactEl.textContent = 
+          `This time could have been used to deepen your understanding in areas like ${missedHours >= 2 ? 'advanced algorithms' : 'a new framework'}, 
+          complete a mini-project, or revise challenging concepts. Consistent effort builds strong foundations!`;
+      }
+    }
+
+    /**
+     * Main function to update the current task, progress bar, and "Today's Focus" section.
+     * It also highlights the current task in the main schedule view.
+     */
+    function updateCurrentTaskAndFocus() {
       const now = new Date();
       const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       const currentDayName = dayNames[now.getDay()];
-      const currentTimeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      // Format the date for display (e.g., "Monday, June 10")
       const dateString = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
       let activeTask = null;
@@ -781,43 +682,69 @@
       let taskProgress = 0;
       let taskStart = 0;
       let taskEnd = 0;
+      let upcomingTasks = [];
 
-      // Update current day display
-      currentDayEl.textContent = dateString;
+      // Update Today's Focus Section with current day and date
+      todayFocusDayEl.textContent = currentDayName;
+      todayFocusDateEl.textContent = dateString;
       
-      // Update time display
-      currentTimeEl.textContent = currentTimeString;
-
       const tasksToday = scheduleData[currentDayName];
       if (tasksToday) {
-        for (const task of tasksToday) {
+        // Iterate through tasks for the current day to find the active task and upcoming tasks
+        for (let i = 0; i < tasksToday.length; i++) {
+          const task = tasksToday[i];
           const taskStartMinutes = timeToMinutes(task.start);
           const taskEndMinutes = timeToMinutes(task.end);
           
-          // Update time indicator position for current day
-          if (currentDayName === "Monday") document.getElementById('mon-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          if (currentDayName === "Tuesday") document.getElementById('tue-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          if (currentDayName === "Wednesday") document.getElementById('wed-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          if (currentDayName === "Thursday") document.getElementById('thu-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          if (currentDayName === "Friday") document.getElementById('fri-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          if (currentDayName === "Saturday") document.getElementById('sat-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          if (currentDayName === "Sunday") document.getElementById('sun-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
-          
           if (currentMinutes >= taskStartMinutes && currentMinutes < taskEndMinutes) {
+            // Found the active task
             activeTask = task;
             activeTaskName = task.task;
             taskStart = taskStartMinutes;
             taskEnd = taskEndMinutes;
-            taskProgress = Math.min(100, Math.max(0, (currentMinutes - taskStart) / (taskEnd - taskStart) * 100));
-            break;
+            // Calculate progress within the current task
+            taskProgress = Math.min(100, Math.max(0, ((currentMinutes - taskStart) / (taskEnd - taskStart)) * 100));
+            
+            // Collect next 3 upcoming tasks (excluding free time/leisure)
+            for (let j = i + 1; j < tasksToday.length && upcomingTasks.length < 3; j++) {
+                if (!tasksToday[j].task.toLowerCase().includes("free time") && !tasksToday[j].task.toLowerCase().includes("leisure")) {
+                    upcomingTasks.push(tasksToday[j]);
+                }
+            }
+            break; // Stop iterating once active task is found and upcoming tasks are collected
+          } else if (currentMinutes < taskStartMinutes) {
+            // If no active task yet, but we are before the current task, consider it and subsequent ones as upcoming
+            if (activeTask === null) {
+                for (let j = i; j < tasksToday.length && upcomingTasks.length < 3; j++) {
+                    if (!tasksToday[j].task.toLowerCase().includes("free time") && !tasksToday[j].task.toLowerCase().includes("leisure")) {
+                        upcomingTasks.push(tasksToday[j]);
+                    }
+                }
+            }
+            break; // No need to check further if we are before any tasks today
           }
         }
       }
 
-      currentTaskEl.textContent = activeTaskName;
-      progressFill.style.width = `${taskProgress}%`;
+      // Update current task display and progress bar in Today's Focus
+      todayFocusCurrentTaskEl.textContent = activeTaskName;
+      todayFocusProgressFill.style.width = `${taskProgress}%`;
 
-      // Remove highlight from previously highlighted task
+      // Populate upcoming tasks list
+      todayFocusUpcomingTasksEl.innerHTML = '';
+      if (upcomingTasks.length > 0) {
+        upcomingTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${task.start}</strong>: ${task.task}`;
+          todayFocusUpcomingTasksEl.appendChild(li);
+        });
+      } else {
+        const li = document.createElement('li');
+        li.textContent = "No more scheduled tasks for today.";
+        todayFocusUpcomingTasksEl.appendChild(li);
+      }
+
+      // Remove highlight from previously highlighted task in the main schedule view
       if (currentlyHighlighted) {
         const prevTaskElement = document.getElementById(currentlyHighlighted);
         if (prevTaskElement) {
@@ -825,7 +752,7 @@
         }
       }
 
-      // Add highlight to current taska
+      // Add highlight to the current active task in the main schedule view
       if (activeTask && activeTask.id) {
         const currentTaskElement = document.getElementById(activeTask.id);
         if (currentTaskElement) {
@@ -839,16 +766,31 @@
       }
     }
 
-    // Initial call and update every second
-    updateCurrentTask();
-    updateLiveClock();
-    setInterval(updateCurrentTask, 1000);
-    setInterval(updateLiveClock, 1000);
+    /**
+     * Initializes the schedule by rendering tasks for all days and setting up initial states.
+     */
+    function initializeSchedule() {
+        for (const day in scheduleData) {
+            renderTasksForDay(day, scheduleData[day]);
+        }
+        updateMissedHoursSummary(); // Perform initial calculation and display of missed hours
+    }
+
+    // Event listener for when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeSchedule(); // Render tasks and set up checkboxes
+        updateLiveClock(); // Initial display of the live clock
+        updateCurrentTaskAndFocus(); // Initial update of current task and focus section
+
+        // Set intervals for continuous updates
+        setInterval(updateCurrentTaskAndFocus, 1000); // Update current task and focus every second
+        setInterval(updateLiveClock, 1000); // Update live clock every second (can be optimized if needed)
+    });
     
-    // Animate elements on load
+    // Animate day cards on page load for a smooth entry effect
     document.querySelectorAll('.day-card').forEach((card, index) => {
       card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
-      card.style.opacity = '0';
+      card.style.opacity = '0'; /* Start with opacity 0 for fadeIn animation */
     });
   </script>
 </body>
