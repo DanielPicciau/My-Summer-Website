@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daniel's Summer Schedule</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #38bdf8;
+      --primary-dark: #0ea5e9;
+      --accent: #818cf8;
+      --bg-dark: #020617;
+      --card-dark: #0f172a;
+      --card-border: #1e293b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #0c1226 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+    
+    .current-task-highlight {
+      position: relative;
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0) 100%) !important;
+      border-left: 4px solid var(--primary) !important;
+      animation: pulse 2s infinite;
+      padding-left: 1.25rem;
+    }
+    
+    .current-task-highlight::before {
+      content: "NOW";
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      background: var(--primary);
+      color: var(--bg-dark);
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+    }
+    
+    .day-card {
+      transition: all 0.3s ease;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .day-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    
+    .day-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px -10px rgba(2, 6, 23, 0.6);
+    }
+    
+    .status-bar {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
+    }
+    
+    .glow-text {
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    
+    .time-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--primary);
+      width: 0;
+      box-shadow: 0 0 10px 2px rgba(56, 189, 248, 0.7);
+      z-index: 20;
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background: rgba(56, 189, 248, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .floating-clock {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 1rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .floating-clock i {
+      color: var(--primary);
+      font-size: 1.25rem;
+    }
+    
+    .clock-time {
+      font-variant-numeric: tabular-nums;
+    }
+    
+    @media (max-width: 1024px) {
+      .floating-clock {
+        top: auto;
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Floating Clock -->
+  <div class="floating-clock">
+    <i class="fas fa-clock"></i>
+    <span id="live-clock" class="clock-time">00:00:00</span>
+  </div>
+  
+  <!-- Main content area -->
+  <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
+    <header class="text-center mb-10">
+      <!-- Status Bar -->
+      <div id="status-bar" class="status-bar mb-8 rounded-xl p-5 text-center max-w-4xl mx-auto">
+        <div class="text-2xl md:text-3xl font-bold mb-2">
+          <span class="text-sky-400">Hello Daniel</span>, 
+          <span id="current-day" class="text-purple-400">Monday</span>
+        </div>
+        <div class="text-lg md:text-xl flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4">
+          <span id="current-task" class="font-semibold text-slate-200">Loading current task...</span>
+          <span class="hidden md:block">•</span>
+          <span id="current-time" class="font-mono text-sky-400">00:00:00</span>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar mt-4">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4 glow-text">
+        <span class="bg-gradient-to-r from-sky-400 to-purple-500 bg-clip-text text-transparent">
+          Summer Development Plan
+        </span>
+      </h1>
+      <p class="text-slate-400 text-lg">
+        <i class="fas fa-calendar mr-2"></i>June 10 – Sept 10, 2025
+      </p>
+    </header>
+
+    <!-- Responsive grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      <!-- Monday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="mon-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-sun text-yellow-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Monday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-mon-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">9:00–10:30</strong>
+              <span class="text-xs text-slate-500">90 min</span>
+            </div>
+            <div class="text-slate-300">Morning routine</div>
+          </li>
+          <li id="task-mon-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">10:30–12:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">HTML/CSS Study</div>
+          </li>
+          <li id="task-mon-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">12:30–13:30</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Lunch + Leisure</div>
+          </li>
+          <li id="task-mon-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">13:30–15:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Project: Webpage/Interface</div>
+          </li>
+          <li id="task-mon-4" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">15:30–16:00</strong>
+              <span class="text-xs text-slate-500">30 min</span>
+            </div>
+            <div class="text-slate-300">Short break</div>
+          </li>
+          <li id="task-mon-5" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">16:00–18:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Practice: CSS/JS</div>
+          </li>
+          <li id="task-mon-6" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">18:00–19:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Dinner</div>
+          </li>
+          <li id="task-mon-7" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">19:00–21:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Coursera (Frontend Module)</div>
+          </li>
+          <li id="task-mon-8" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">21:00–23:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Free time</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Tuesday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="tue-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-code text-purple-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Tuesday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-tue-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">9:00–10:30</strong>
+              <span class="text-xs text-slate-500">90 min</span>
+            </div>
+            <div class="text-slate-300">Morning routine</div>
+          </li>
+          <li id="task-tue-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">10:30–12:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Django Basics</div>
+          </li>
+          <li id="task-tue-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">12:30–13:30</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Lunch + Leisure</div>
+          </li>
+          <li id="task-tue-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">13:30–15:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Coding: Django Project</div>
+          </li>
+          <li id="task-tue-4" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">15:30–16:00</strong>
+              <span class="text-xs text-slate-500">30 min</span>
+            </div>
+            <div class="text-slate-300">Short break</div>
+          </li>
+          <li id="task-tue-5" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">16:00–18:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Continue: Add Functionality</div>
+          </li>
+          <li id="task-tue-6" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">18:00–19:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Dinner</div>
+          </li>
+          <li id="task-tue-7" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">19:00–21:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Assignments/Tutorials</div>
+          </li>
+          <li id="task-tue-8" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">21:00–23:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Free time</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Wednesday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="wed-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-chart-line text-green-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Wednesday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-wed-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">9:00–10:30</strong>
+              <span class="text-xs text-slate-500">90 min</span>
+            </div>
+            <div class="text-slate-300">Morning routine</div>
+          </li>
+          <li id="task-wed-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">10:30–12:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Pandas Fundamentals</div>
+          </li>
+          <li id="task-wed-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">12:30–13:30</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Lunch + Leisure</div>
+          </li>
+          <li id="task-wed-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">13:30–15:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Data Practice</div>
+          </li>
+          <li id="task-wed-4" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">15:30–16:00</strong>
+              <span class="text-xs text-slate-500">30 min</span>
+            </div>
+            <div class="text-slate-300">Short break</div>
+          </li>
+          <li id="task-wed-5" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">16:00–18:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Data Transformations</div>
+          </li>
+          <li id="task-wed-6" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">18:00–19:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Dinner</div>
+          </li>
+          <li id="task-wed-7" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">19:00–21:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Coursera Challenges</div>
+          </li>
+          <li id="task-wed-8" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">21:00–23:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Free time</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Thursday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="thu-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-brain text-indigo-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Thursday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-thu-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">9:00–10:30</strong>
+              <span class="text-xs text-slate-500">90 min</span>
+            </div>
+            <div class="text-slate-300">Morning routine</div>
+          </li>
+          <li id="task-thu-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">10:30–12:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Advanced Concepts</div>
+          </li>
+          <li id="task-thu-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">12:30–13:30</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Lunch + Leisure</div>
+          </li>
+          <li id="task-thu-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">13:30–15:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Apply Concepts in Code</div>
+          </li>
+          <li id="task-thu-4" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">15:30–16:00</strong>
+              <span class="text-xs text-slate-500">30 min</span>
+            </div>
+            <div class="text-slate-300">Short break</div>
+          </li>
+          <li id="task-thu-5" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">16:00–18:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Course Project Work</div>
+          </li>
+          <li id="task-thu-6" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">18:00–19:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Dinner</div>
+          </li>
+          <li id="task-thu-7" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">19:00–21:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Reinforce Learning</div>
+          </li>
+          <li id="task-thu-8" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">21:00–23:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Free time</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Friday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="fri-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-rocket text-orange-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Friday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-fri-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">9:00–10:30</strong>
+              <span class="text-xs text-slate-500">90 min</span>
+            </div>
+            <div class="text-slate-300">Morning routine</div>
+          </li>
+          <li id="task-fri-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">10:30–12:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Project Planning</div>
+          </li>
+          <li id="task-fri-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">12:30–13:30</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Lunch + Leisure</div>
+          </li>
+          <li id="task-fri-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">13:30–15:30</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Project: Start Building</div>
+          </li>
+          <li id="task-fri-4" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">15:30–16:00</strong>
+              <span class="text-xs text-slate-500">30 min</span>
+            </div>
+            <div class="text-slate-300">Short break</div>
+          </li>
+          <li id="task-fri-5" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">16:00–18:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Features & Fixes</div>
+          </li>
+          <li id="task-fri-6" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">18:00–19:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Dinner</div>
+          </li>
+          <li id="task-fri-7" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">19:00–21:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Finalize/Review</div>
+          </li>
+          <li id="task-fri-8" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">21:00–23:00</strong>
+              <span class="text-xs text-slate-500">120 min</span>
+            </div>
+            <div class="text-slate-300">Free time</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Saturday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="sat-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-coffee text-amber-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Saturday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-sat-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">9:00–10:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Morning routine & Week Review</div>
+          </li>
+          <li id="task-sat-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">10:00–13:00</strong>
+              <span class="text-xs text-slate-500">180 min</span>
+            </div>
+            <div class="text-slate-300">Extended Project Work</div>
+          </li>
+          <li id="task-sat-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">13:00–14:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Lunch Break</div>
+          </li>
+          <li id="task-sat-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">14:00–17:00</strong>
+              <span class="text-xs text-slate-500">180 min</span>
+            </div>
+            <div class="text-slate-300">Skill Deep Dive / New Tech Exploration</div>
+          </li>
+          <li id="task-sat-4" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">17:00–18:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Physical Activity / Outdoors</div>
+          </li>
+          <li id="task-sat-5" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">18:00 onwards</strong>
+              <span class="text-xs text-slate-500">-</span>
+            </div>
+            <div class="text-slate-300">Free time / Social</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Sunday -->
+      <div class="day-card bg-card-dark rounded-xl p-6 relative">
+        <div class="time-indicator" id="sun-indicator"></div>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-restroom text-cyan-400 mr-3 text-xl"></i>
+          <h2 class="text-2xl font-bold text-sky-400">Sunday</h2>
+        </div>
+        <ul class="space-y-4">
+          <li id="task-sun-0" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">Flexible</strong>
+              <span class="text-xs text-slate-500">-</span>
+            </div>
+            <div class="text-slate-300">Rest & Recharge</div>
+          </li>
+          <li id="task-sun-1" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">Afternoon</strong>
+              <span class="text-xs text-slate-500">-</span>
+            </div>
+            <div class="text-slate-300">Plan for Next Week</div>
+          </li>
+          <li id="task-sun-2" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">Evening</strong>
+              <span class="text-xs text-slate-500">-</span>
+            </div>
+            <div class="text-slate-300">Relaxing Activities / Hobbies</div>
+          </li>
+          <li id="task-sun-3" class="p-2 rounded-lg">
+            <div class="flex justify-between">
+              <strong class="text-slate-100">21:00–22:00</strong>
+              <span class="text-xs text-slate-500">60 min</span>
+            </div>
+            <div class="text-slate-300">Prepare for Monday</div>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Page Footer -->
+  <footer class="w-full text-center py-6 border-t border-slate-800 bg-slate-950">
+    <p class="text-slate-500 text-sm">
+      <i class="fas fa-code mr-1"></i>Created for Daniel's Summer Plan • 
+      <i class="fas fa-tv ml-2 mr-1"></i>Optimized for Smart TV • 
+      <i class="fas fa-sync-alt ml-2 mr-1"></i>Updated: June 2025
+    </p>
+  </footer>
+
+  <script>
+    const scheduleData = {
+      Monday: [
+        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-mon-0" },
+        { start: "10:30", end: "12:30", task: "HTML/CSS Study", id: "task-mon-1" },
+        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-mon-2" },
+        { start: "13:30", end: "15:30", task: "Project: Webpage/Interface", id: "task-mon-3" },
+        { start: "15:30", end: "16:00", task: "Short break", id: "task-mon-4" },
+        { start: "16:00", end: "18:00", task: "Practice: CSS/JS", id: "task-mon-5" },
+        { start: "18:00", end: "19:00", task: "Dinner", id: "task-mon-6" },
+        { start: "19:00", end: "21:00", task: "Coursera (Frontend Module)", id: "task-mon-7" },
+        { start: "21:00", end: "23:59", task: "Free time", id: "task-mon-8" },
+      ],
+      Tuesday: [
+        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-tue-0" },
+        { start: "10:30", end: "12:30", task: "Django Basics", id: "task-tue-1" },
+        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-tue-2" },
+        { start: "13:30", end: "15:30", task: "Coding: Django Project", id: "task-tue-3" },
+        { start: "15:30", end: "16:00", task: "Short break", id: "task-tue-4" },
+        { start: "16:00", end: "18:00", task: "Continue: Add Functionality", id: "task-tue-5" },
+        { start: "18:00", end: "19:00", task: "Dinner", id: "task-tue-6" },
+        { start: "19:00", end: "21:00", task: "Assignments/Tutorials", id: "task-tue-7" },
+        { start: "21:00", end: "23:59", task: "Free time", id: "task-tue-8" },
+      ],
+      Wednesday: [
+        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-wed-0" },
+        { start: "10:30", end: "12:30", task: "Pandas Fundamentals", id: "task-wed-1" },
+        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-wed-2" },
+        { start: "13:30", end: "15:30", task: "Data Practice", id: "task-wed-3" },
+        { start: "15:30", end: "16:00", task: "Short break", id: "task-wed-4" },
+        { start: "16:00", end: "18:00", task: "Data Transformations", id: "task-wed-5" },
+        { start: "18:00", end: "19:00", task: "Dinner", id: "task-wed-6" },
+        { start: "19:00", end: "21:00", task: "Coursera Challenges", id: "task-wed-7" },
+        { start: "21:00", end: "23:59", task: "Free time", id: "task-wed-8" },
+      ],
+      Thursday: [
+        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-thu-0" },
+        { start: "10:30", end: "12:30", task: "Advanced Concepts", id: "task-thu-1" },
+        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-thu-2" },
+        { start: "13:30", end: "15:30", task: "Apply Concepts in Code", id: "task-thu-3" },
+        { start: "15:30", end: "16:00", task: "Short break", id: "task-thu-4" },
+        { start: "16:00", end: "18:00", task: "Course Project Work", id: "task-thu-5" },
+        { start: "18:00", end: "19:00", task: "Dinner", id: "task-thu-6" },
+        { start: "19:00", end: "21:00", task: "Reinforce Learning", id: "task-thu-7" },
+        { start: "21:00", end: "23:59", task: "Free time", id: "task-thu-8" },
+      ],
+      Friday: [
+        { start: "09:00", end: "10:30", task: "Morning routine", id: "task-fri-0" },
+        { start: "10:30", end: "12:30", task: "Project Planning", id: "task-fri-1" },
+        { start: "12:30", end: "13:30", task: "Lunch + Leisure", id: "task-fri-2" },
+        { start: "13:30", end: "15:30", task: "Project: Start Building", id: "task-fri-3" },
+        { start: "15:30", end: "16:00", task: "Short break", id: "task-fri-4" },
+        { start: "16:00", end: "18:00", task: "Features & Fixes", id: "task-fri-5" },
+        { start: "18:00", end: "19:00", task: "Dinner", id: "task-fri-6" },
+        { start: "19:00", end: "21:00", task: "Finalize/Review", id: "task-fri-7" },
+        { start: "21:00", end: "23:59", task: "Free time", id: "task-fri-8" },
+      ],
+      Saturday: [
+        { start: "09:00", end: "10:00", task: "Morning routine & Week Review", id: "task-sat-0" },
+        { start: "10:00", end: "13:00", task: "Extended Project Work", id: "task-sat-1" },
+        { start: "13:00", end: "14:00", task: "Lunch Break", id: "task-sat-2" },
+        { start: "14:00", end: "17:00", task: "Skill Deep Dive / New Tech Exploration", id: "task-sat-3" },
+        { start: "17:00", end: "18:00", task: "Physical Activity / Outdoors", id: "task-sat-4" },
+        { start: "18:00", end: "23:59", task: "Free time / Social", id: "task-sat-5" },
+      ],
+      Sunday: [
+        { start: "00:00", end: "12:59", task: "Rest & Recharge", id: "task-sun-0" },
+        { start: "13:00", end: "17:00", task: "Plan for Next Week", id: "task-sun-1" },
+        { start: "17:01", end: "20:59", task: "Relaxing Activities / Hobbies", id: "task-sun-2" },
+        { start: "21:00", end: "22:00", task: "Prepare for Monday", id: "task-sun-3" },
+        { start: "22:01", end: "23:59", task: "Rest & Recharge", id: "task-sun-4" }
+      ],
+    };
+
+    // DOM Elements
+    const statusBar = document.getElementById('status-bar');
+    const currentTaskEl = document.getElementById('current-task');
+    const currentTimeEl = document.getElementById('current-time');
+    const currentDayEl = document.getElementById('current-day');
+    const progressFill = document.getElementById('progress-fill');
+    const liveClock = document.getElementById('live-clock');
+    let currentlyHighlighted = null;
+
+    function timeToMinutes(timeStr) {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      return hours * 60 + minutes;
+    }
+
+    function updateLiveClock() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      liveClock.textContent = timeString;
+    }
+
+    function updateCurrentTask() {
+      const now = new Date();
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const currentDayName = dayNames[now.getDay()];
+      const currentTimeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const dateString = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+      let activeTask = null;
+      let activeTaskName = "Free Time / Unscheduled";
+      let taskProgress = 0;
+      let taskStart = 0;
+      let taskEnd = 0;
+
+      // Update current day display
+      currentDayEl.textContent = dateString;
+      
+      // Update time display
+      currentTimeEl.textContent = currentTimeString;
+
+      const tasksToday = scheduleData[currentDayName];
+      if (tasksToday) {
+        for (const task of tasksToday) {
+          const taskStartMinutes = timeToMinutes(task.start);
+          const taskEndMinutes = timeToMinutes(task.end);
+          
+          // Update time indicator position for current day
+          if (currentDayName === "Monday") document.getElementById('mon-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          if (currentDayName === "Tuesday") document.getElementById('tue-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          if (currentDayName === "Wednesday") document.getElementById('wed-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          if (currentDayName === "Thursday") document.getElementById('thu-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          if (currentDayName === "Friday") document.getElementById('fri-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          if (currentDayName === "Saturday") document.getElementById('sat-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          if (currentDayName === "Sunday") document.getElementById('sun-indicator').style.width = `${(currentMinutes - taskStartMinutes) / (taskEndMinutes - taskStartMinutes) * 100}%`;
+          
+          if (currentMinutes >= taskStartMinutes && currentMinutes < taskEndMinutes) {
+            activeTask = task;
+            activeTaskName = task.task;
+            taskStart = taskStartMinutes;
+            taskEnd = taskEndMinutes;
+            taskProgress = Math.min(100, Math.max(0, (currentMinutes - taskStart) / (taskEnd - taskStart) * 100));
+            break;
+          }
+        }
+      }
+
+      currentTaskEl.textContent = activeTaskName;
+      progressFill.style.width = `${taskProgress}%`;
+
+      // Remove highlight from previously highlighted task
+      if (currentlyHighlighted) {
+        const prevTaskElement = document.getElementById(currentlyHighlighted);
+        if (prevTaskElement) {
+          prevTaskElement.classList.remove('current-task-highlight');
+        }
+      }
+
+      // Add highlight to current taska
+      if (activeTask && activeTask.id) {
+        const currentTaskElement = document.getElementById(activeTask.id);
+        if (currentTaskElement) {
+          currentTaskElement.classList.add('current-task-highlight');
+          currentlyHighlighted = activeTask.id;
+        } else {
+          currentlyHighlighted = null;
+        }
+      } else {
+        currentlyHighlighted = null;
+      }
+    }
+
+    // Initial call and update every second
+    updateCurrentTask();
+    updateLiveClock();
+    setInterval(updateCurrentTask, 1000);
+    setInterval(updateLiveClock, 1000);
+    
+    // Animate elements on load
+    document.querySelectorAll('.day-card').forEach((card, index) => {
+      card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
+      card.style.opacity = '0';
+    });
+  </script>
+</body>
+</html>
