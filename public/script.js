@@ -1,3 +1,9 @@
+// Pushover Configuration
+const PUSHOVER_API_URL = 'https://api.pushover.net/1/messages.json';
+let pushoverUserKey = 'u5cz4j61ut3qz3ehbh4gzo9dnwg423';
+let pushoverApiToken = 'acdwyq6voywdmw2dt1dnu4jgjui7jr';
+let lastNotifiedTaskId = null;
+
 // Notification System
 const notification = {
   element: document.getElementById('notification'),
@@ -24,6 +30,36 @@ const notification = {
   }
 };
 
+// Pushover Notification Function
+async function sendPushoverNotification(title, message) {
+  try {
+    const formData = new FormData();
+    formData.append('token', pushoverApiToken);
+    formData.append('user', pushoverUserKey);
+    formData.append('title', title);
+    formData.append('message', message);
+    formData.append('sound', 'cosmic');
+
+    const response = await fetch(PUSHOVER_API_URL, {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.status === 1) {
+      notification.show('Notification Sent', 'Mobile notification has been delivered!');
+      return true;
+    } else {
+      notification.show('Error', `Failed to send notification: ${result.errors?.join(', ') || 'Unknown error'}`);
+      return false;
+    }
+  } catch (error) {
+    notification.show('Error', `Failed to send notification: ${error.message}`);
+    return false;
+  }
+}
+
 // Initialize notification system
 notification.init();
 
@@ -37,9 +73,35 @@ const todayFocusProgressFill = document.getElementById('today-focus-progress-fil
 const todayFocusUpcomingTasksEl = document.getElementById('today-focus-upcoming-tasks');
 const missedHoursSummaryEl = document.getElementById('missed-hours-summary');
 const missedHoursImpactEl = document.getElementById('missed-hours-impact');
+const savePushoverBtn = document.getElementById('save-pushover');
+const testNotificationBtn = document.getElementById('test-notification');
 
 let currentlyHighlighted = null;
 let scheduleData = {}; // Will be populated from server
+
+// Save Pushover configuration
+if (savePushoverBtn) {
+  savePushoverBtn.addEventListener('click', () => {
+    pushoverUserKey = document.getElementById('pushover-user').value;
+    pushoverApiToken = document.getElementById('pushover-token').value;
+
+    localStorage.setItem('pushoverUserKey', pushoverUserKey);
+    localStorage.setItem('pushoverApiToken', pushoverApiToken);
+
+    notification.show('Configuration Saved', 'Pushover settings have been updated successfully!');
+  });
+}
+
+// Test notification
+if (testNotificationBtn) {
+  testNotificationBtn.addEventListener('click', async () => {
+    notification.show('Sending Test', 'Sending test notification to your mobile...');
+    await sendPushoverNotification(
+      'Schedule Notification Test',
+      'This is a test notification from your summer schedule app!'
+    );
+  });
+}
 
 // Fetch schedule data from server
 async function fetchScheduleData() {
@@ -221,6 +283,14 @@ async function updateCurrentTaskAndFocus() {
         taskStart = taskStartMinutes;
         taskEnd = taskEndMinutes;
         taskProgress = Math.min(100, Math.max(0, ((currentMinutes - taskStart) / (taskEnd - taskStart)) * 100));
+
+        if (lastNotifiedTaskId !== task.id) {
+          lastNotifiedTaskId = task.id;
+          await sendPushoverNotification(
+            `Time for: ${task.task}`,
+            `From ${task.start} to ${task.end}`
+          );
+        }
         
         for (let j = i + 1; j < tasksToday.length && upcomingTasks.length < 3; j++) {
             if (!tasksToday[j].task.toLowerCase().includes("free time") && 
@@ -289,6 +359,19 @@ async function initializeSchedule() {
 
 // Event listener for when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  const savedUserKey = localStorage.getItem('pushoverUserKey');
+  const savedApiToken = localStorage.getItem('pushoverApiToken');
+
+  if (savedUserKey) {
+    document.getElementById('pushover-user').value = savedUserKey;
+    pushoverUserKey = savedUserKey;
+  }
+
+  if (savedApiToken) {
+    document.getElementById('pushover-token').value = savedApiToken;
+    pushoverApiToken = savedApiToken;
+  }
+
   initializeSchedule();
   updateLiveClock();
   updateCurrentTaskAndFocus();
