@@ -1,324 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- ... (head content remains the same) ... -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Summer Schedule</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* ... (styles remain the same) ... */
-    
-    /* Remove Pushover configuration section */
-    .pushover-section {
-      display: none;
-    }
+    .task-completed { text-decoration: line-through; opacity: 0.5; }
+    .current-task-highlight { border: 2px solid #3b82f6; }
+    #notification { display: none; position: fixed; top: 1rem; right: 1rem; background: #2d3748; color: #fff; padding: 1rem; border-radius: 0.25rem; }
+    #notification.show { display: block; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
-  <!-- ... (body content remains the same except removed Pushover section) ... -->
-  
-  <script>
-    // Notification System
-    const notification = {
-      element: document.getElementById('notification'),
-      title: document.getElementById('notification-title'),
-      message: document.getElementById('notification-message'),
-      closeBtn: document.querySelector('.notification-close'),
-      
-      init: function() {
-        this.closeBtn.addEventListener('click', () => this.hide());
-      },
-      
-      show: function(title, message, duration = 5000) {
-        this.title.textContent = title;
-        this.message.textContent = message;
-        this.element.classList.add('show');
-        
-        if (duration > 0) {
-          setTimeout(() => this.hide(), duration);
-        }
-      },
-      
-      hide: function() {
-        this.element.classList.remove('show');
-      }
-    };
+<body class="min-h-screen bg-slate-900 text-slate-100 p-4 flex flex-col gap-4">
+  <div id="notification">
+    <button class="notification-close float-right">&times;</button>
+    <h3 id="notification-title" class="font-bold"></h3>
+    <p id="notification-message"></p>
+  </div>
 
-    // Initialize notification system
-    notification.init();
+  <header class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Schedule</h1>
+    <span id="live-clock" class="text-sm"></span>
+  </header>
 
-    // DOM Elements
-    const liveClockEl = document.getElementById('live-clock');
-    const todayFocusDayEl = document.getElementById('today-focus-day');
-    const todayFocusDateEl = document.getElementById('today-focus-date');
-    const todayFocusTimeEl = document.getElementById('today-focus-time');
-    const todayFocusCurrentTaskEl = document.getElementById('today-focus-current-task');
-    const todayFocusProgressFill = document.getElementById('today-focus-progress-fill');
-    const todayFocusUpcomingTasksEl = document.getElementById('today-focus-upcoming-tasks');
-    const missedHoursSummaryEl = document.getElementById('missed-hours-summary');
-    const missedHoursImpactEl = document.getElementById('missed-hours-impact');
-    
-    let currentlyHighlighted = null;
-    let scheduleData = {}; // Will be populated from server
+  <section id="today-focus" class="bg-slate-800 p-4 rounded">
+    <div class="flex justify-between">
+      <div>
+        <div id="today-focus-day" class="font-semibold"></div>
+        <div id="today-focus-date" class="text-sm text-slate-400"></div>
+      </div>
+      <div id="today-focus-time" class="text-sm"></div>
+    </div>
+    <p class="mt-2" id="today-focus-current-task"></p>
+    <div class="w-full h-2 bg-slate-700 rounded">
+      <div id="today-focus-progress-fill" class="h-full bg-blue-500 rounded" style="width:0%"></div>
+    </div>
+    <h3 class="mt-2 font-semibold">Upcoming Tasks</h3>
+    <ul id="today-focus-upcoming-tasks" class="list-disc list-inside"></ul>
+  </section>
 
-    // Fetch schedule data from server
-    async function fetchScheduleData() {
-      try {
-        const response = await fetch('/api/tasks');
-        const data = await response.json();
-        scheduleData = data.schedule;
-        return data.completions;
-      } catch (error) {
-        console.error('Error fetching schedule data:', error);
-        return {};
-      }
-    }
+  <div id="schedule" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="day-card bg-slate-800 p-4 rounded" id="sunday">
+      <h2 class="font-semibold mb-2">Sunday</h2>
+      <ul id="sunday-tasks" class="space-y-2"></ul>
+    </div>
+    <div class="day-card bg-slate-800 p-4 rounded" id="monday">
+      <h2 class="font-semibold mb-2">Monday</h2>
+      <ul id="monday-tasks" class="space-y-2"></ul>
+    </div>
+    <div class="day-card bg-slate-800 p-4 rounded" id="tuesday">
+      <h2 class="font-semibold mb-2">Tuesday</h2>
+      <ul id="tuesday-tasks" class="space-y-2"></ul>
+    </div>
+    <div class="day-card bg-slate-800 p-4 rounded" id="wednesday">
+      <h2 class="font-semibold mb-2">Wednesday</h2>
+      <ul id="wednesday-tasks" class="space-y-2"></ul>
+    </div>
+    <div class="day-card bg-slate-800 p-4 rounded" id="thursday">
+      <h2 class="font-semibold mb-2">Thursday</h2>
+      <ul id="thursday-tasks" class="space-y-2"></ul>
+    </div>
+    <div class="day-card bg-slate-800 p-4 rounded" id="friday">
+      <h2 class="font-semibold mb-2">Friday</h2>
+      <ul id="friday-tasks" class="space-y-2"></ul>
+    </div>
+    <div class="day-card bg-slate-800 p-4 rounded" id="saturday">
+      <h2 class="font-semibold mb-2">Saturday</h2>
+      <ul id="saturday-tasks" class="space-y-2"></ul>
+    </div>
+  </div>
 
-    function timeToMinutes(timeStr) {
-      const [hours, minutes] = timeStr.split(':').map(Number);
-      return hours * 60 + minutes;
-    }
+  <section id="missed-hours" class="bg-slate-800 p-4 rounded">
+    <p id="missed-hours-summary"></p>
+    <p id="missed-hours-impact" class="text-sm text-slate-400"></p>
+  </section>
 
-    function updateLiveClock() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      liveClockEl.textContent = timeString;
-      todayFocusTimeEl.textContent = timeString;
-    }
-
-    async function saveTaskCompletion(taskId, isCompleted) {
-      try {
-        await fetch(`/api/tasks/${taskId}/complete`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ completed: isCompleted })
-        });
-      } catch (error) {
-        console.error('Error saving task completion:', error);
-      }
-      updateMissedHoursSummary();
-    }
-
-    function renderTasksForDay(dayName, tasks, completions) {
-      const ulElement = document.getElementById(`${dayName.toLowerCase()}-tasks`);
-      if (!ulElement) return;
-
-      ulElement.innerHTML = '';
-
-      tasks.forEach(task => {
-        const isCompleted = completions[task.id] || false;
-
-        const li = document.createElement('li');
-        li.id = task.id;
-        li.className = `p-2 rounded-lg flex items-start gap-2 ${isCompleted ? 'task-completed' : ''}`;
-
-        li.innerHTML = `
-          <input type="checkbox" class="task-checkbox mt-1" id="checkbox-${task.id}" ${isCompleted ? 'checked' : ''}>
-          <div class="flex-1">
-            <div class="flex justify-between items-center">
-              <strong class="text-slate-100">${task.start}–${task.end}</strong>
-              <span class="text-xs text-slate-500">${task.duration} min</span>
-            </div>
-            <div class="text-slate-300">${task.task}</div>
-          </div>
-        `;
-        
-        ulElement.appendChild(li);
-
-        const checkbox = document.getElementById(`checkbox-${task.id}`);
-        if (checkbox) {
-            checkbox.addEventListener('change', (event) => {
-                saveTaskCompletion(task.id, event.target.checked);
-                if (event.target.checked) {
-                    li.classList.add('task-completed');
-                } else {
-                    li.classList.remove('task-completed');
-                }
-            });
-        }
-      });
-    }
-
-    async function calculateMissedHours() {
-      let missedMinutes = 0;
-      const now = new Date();
-      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      const currentDayIndex = now.getDay();
-      const currentMinutesOfDay = now.getHours() * 60 + now.getMinutes();
-
-      // Get completions from server
-      const completions = await fetchScheduleData();
-
-      for (let i = 0; i < dayNames.length; i++) {
-        const dayName = dayNames[i];
-        const dayTasks = scheduleData[dayName];
-        if (!dayTasks) continue;
-
-        if (i < currentDayIndex) {
-          dayTasks.forEach(task => {
-            if (task.task.toLowerCase().includes("free time") || 
-                task.task.toLowerCase().includes("leisure") || 
-                task.duration === undefined) {
-              return; 
-            }
-            const isCompleted = completions[task.id] || false;
-            if (!isCompleted) {
-              missedMinutes += task.duration;
-            }
-          });
-        } else if (i === currentDayIndex) {
-          dayTasks.forEach(task => {
-            const taskEndMinutes = timeToMinutes(task.end);
-            if (taskEndMinutes <= currentMinutesOfDay) {
-              if (task.task.toLowerCase().includes("free time") || 
-                  task.task.toLowerCase().includes("leisure") || 
-                  task.duration === undefined) {
-                return; 
-              }
-              const isCompleted = completions[task.id] || false;
-              if (!isCompleted) {
-                missedMinutes += task.duration;
-              }
-            }
-          });
-        }
-      }
-      return missedMinutes;
-    }
-
-    async function updateMissedHoursSummary() {
-      const totalMissedMinutes = await calculateMissedHours();
-      const missedHours = Math.floor(totalMissedMinutes / 60);
-      const remainingMinutes = totalMissedMinutes % 60;
-
-      if (totalMissedMinutes === 0) {
-        missedHoursSummaryEl.textContent = "You haven't missed any study time! Keep up the great work.";
-        missedHoursImpactEl.textContent = "";
-      } else {
-        let timeString = '';
-        if (missedHours > 0) {
-            timeString += `${missedHours} hour${missedHours > 1 ? 's' : ''}`;
-        }
-        if (remainingMinutes > 0) {
-            if (timeString) timeString += ' and ';
-            timeString += `${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}`;
-        }
-        
-        missedHoursSummaryEl.textContent = `You have missed approximately ${timeString} of study time.`;
-        missedHoursImpactEl.textContent = 
-          `This time could have been used to deepen your understanding in areas like ${missedHours >= 2 ? 'advanced algorithms' : 'a new framework'}, 
-          complete a mini-project, or revise challenging concepts. Consistent effort builds strong foundations!`;
-      }
-    }
-
-    async function updateCurrentTaskAndFocus() {
-      const now = new Date();
-      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      const currentDayName = dayNames[now.getDay()];
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const dateString = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-      let activeTask = null;
-      let activeTaskName = "Free Time / Unscheduled";
-      let taskProgress = 0;
-      let taskStart = 0;
-      let taskEnd = 0;
-      let upcomingTasks = [];
-
-      todayFocusDayEl.textContent = currentDayName;
-      todayFocusDateEl.textContent = dateString;
-      
-      const tasksToday = scheduleData[currentDayName];
-      if (tasksToday) {
-        for (let i = 0; i < tasksToday.length; i++) {
-          const task = tasksToday[i];
-          const taskStartMinutes = timeToMinutes(task.start);
-          const taskEndMinutes = timeToMinutes(task.end);
-          
-          if (currentMinutes >= taskStartMinutes && currentMinutes < taskEndMinutes) {
-            activeTask = task;
-            activeTaskName = task.task;
-            taskStart = taskStartMinutes;
-            taskEnd = taskEndMinutes;
-            taskProgress = Math.min(100, Math.max(0, ((currentMinutes - taskStart) / (taskEnd - taskStart)) * 100));
-            
-            for (let j = i + 1; j < tasksToday.length && upcomingTasks.length < 3; j++) {
-                if (!tasksToday[j].task.toLowerCase().includes("free time") && 
-                    !tasksToday[j].task.toLowerCase().includes("leisure")) {
-                    upcomingTasks.push(tasksToday[j]);
-                }
-            }
-            break;
-          } else if (currentMinutes < taskStartMinutes) {
-            if (activeTask === null) {
-                for (let j = i; j < tasksToday.length && upcomingTasks.length < 3; j++) {
-                    if (!tasksToday[j].task.toLowerCase().includes("free time") && 
-                        !tasksToday[j].task.toLowerCase().includes("leisure")) {
-                        upcomingTasks.push(tasksToday[j]);
-                    }
-                }
-            }
-            break;
-          }
-        }
-      }
-
-      todayFocusCurrentTaskEl.textContent = activeTaskName;
-      todayFocusProgressFill.style.width = `${taskProgress}%`;
-
-      todayFocusUpcomingTasksEl.innerHTML = '';
-      if (upcomingTasks.length > 0) {
-        upcomingTasks.forEach(task => {
-          const li = document.createElement('li');
-          li.innerHTML = `<strong>${task.start}</strong>: ${task.task}`;
-          todayFocusUpcomingTasksEl.appendChild(li);
-        });
-      } else {
-        const li = document.createElement('li');
-        li.textContent = "No more scheduled tasks for today.";
-        todayFocusUpcomingTasksEl.appendChild(li);
-      }
-
-      if (currentlyHighlighted) {
-        const prevTaskElement = document.getElementById(currentlyHighlighted);
-        if (prevTaskElement) {
-          prevTaskElement.classList.remove('current-task-highlight');
-        }
-      }
-
-      if (activeTask && activeTask.id) {
-        const currentTaskElement = document.getElementById(activeTask.id);
-        if (currentTaskElement) {
-          currentTaskElement.classList.add('current-task-highlight');
-          currentlyHighlighted = activeTask.id;
-        } else {
-          currentlyHighlighted = null;
-        }
-      } else {
-        currentlyHighlighted = null;
-      }
-    }
-
-    async function initializeSchedule() {
-      const completions = await fetchScheduleData();
-      for (const day in scheduleData) {
-        renderTasksForDay(day, scheduleData[day], completions);
-      }
-      updateMissedHoursSummary();
-    }
-
-    // Event listener for when the DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeSchedule();
-      updateLiveClock();
-      updateCurrentTaskAndFocus();
-
-      setInterval(updateCurrentTaskAndFocus, 1000);
-      setInterval(updateLiveClock, 1000);
-    });
-    
-    // Animate day cards on page load
-    document.querySelectorAll('.day-card').forEach((card, index) => {
-      card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
-      card.style.opacity = '0';
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
