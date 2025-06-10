@@ -3,40 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daniel's Summer Schedule</title>
+  <title>Daniel's Summer Schedule with Pushover</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* Define CSS variables for consistent theming */
     :root {
-      --primary: #38bdf8; /* Sky Blue */
-      --primary-dark: #0ea5e9; /* Darker Sky Blue */
-      --accent: #818cf8; /* Indigo */
-      --bg-dark: #020617; /* Darkest Slate */
-      --card-dark: #0f172a; /* Dark Slate Blue */
-      --card-border: #1e293b; /* Lighter Slate Blue for borders */
-      --text-primary: #e2e8f0; /* Off-white for main text */
-      --text-secondary: #94a3b8; /* Lighter slate for secondary text */
+      --primary: #38bdf8;
+      --primary-dark: #0ea5e9;
+      --accent: #818cf8;
+      --bg-dark: #020617;
+      --card-dark: #0f172a;
+      --card-border: #1e293b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
     }
     
-    /* Basic reset for all elements */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
     
-    /* Body styling: font, background gradient, text color, min height for full page */
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, var(--bg-dark) 0%, #0c1226 100%);
       color: var(--text-primary);
       min-height: 100vh;
-      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-x: hidden;
     }
     
-    /* Keyframe animations for fade-in and pulse effects */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -48,16 +44,14 @@
       100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
     }
     
-    /* Styling for the currently active task highlight */
     .current-task-highlight {
       position: relative;
       background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0) 100%) !important;
       border-left: 4px solid var(--primary) !important;
-      animation: pulse 2s infinite; /* Pulsing effect for emphasis */
-      padding-left: 1.25rem; /* Adjust padding due to border */
+      animation: pulse 2s infinite;
+      padding-left: 1.25rem;
     }
     
-    /* "NOW" label for the current task */
     .current-task-highlight::before {
       content: "NOW";
       position: absolute;
@@ -69,19 +63,17 @@
       font-size: 0.7rem;
       font-weight: 800;
       padding: 0.15rem 0.5rem;
-      border-radius: 9999px; /* Pill shape */
+      border-radius: 9999px;
     }
     
-    /* Styling for individual day cards */
     .day-card {
-      transition: all 0.3s ease; /* Smooth transition for hover effects */
+      transition: all 0.3s ease;
       border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.5); /* Soft shadow */
+      box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.5);
       position: relative;
       overflow: hidden;
     }
     
-    /* Gradient top border for day cards */
     .day-card::before {
       content: '';
       position: absolute;
@@ -92,13 +84,11 @@
       background: linear-gradient(90deg, var(--primary), var(--accent));
     }
     
-    /* Hover effect for day cards */
     .day-card:hover {
-      transform: translateY(-5px); /* Lift effect */
-      box-shadow: 0 15px 35px -10px rgba(2, 6, 23, 0.6); /* Enhanced shadow */
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px -10px rgba(2, 6, 23, 0.6);
     }
     
-    /* Status bar styling (note: original status bar was refactored into "Today's Focus") */
     .status-bar {
       background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(10px);
@@ -106,12 +96,10 @@
       box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
     }
     
-    /* Text glow effect */
     .glow-text {
       text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
         
-    /* Progress bar styling */
     .progress-bar {
       height: 4px;
       background: rgba(56, 189, 248, 0.2);
@@ -119,15 +107,13 @@
       overflow: hidden;
     }
     
-    /* Progress fill inside the bar */
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--primary), var(--accent));
       width: 0%;
-      transition: width 0.5s ease; /* Smooth width change */
+      transition: width 0.5s ease;
     }
     
-    /* Floating clock styling (fixed position) */
     .floating-clock {
       position: fixed;
       top: 1rem;
@@ -140,70 +126,166 @@
       font-size: 1.5rem;
       font-weight: 700;
       box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
-      z-index: 100; /* Ensure it stays on top */
+      z-index: 100;
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
     
-    /* Icon styling within the floating clock */
     .floating-clock i {
       color: var(--primary);
       font-size: 1.25rem;
     }
     
-    /* Monospaced numbers for clock for consistent display */
     .clock-time {
       font-variant-numeric: tabular-nums;
     }
 
-    /* Styling for completed tasks (line-through and faded) */
     .task-completed {
       text-decoration: line-through;
       color: var(--text-secondary);
       opacity: 0.7;
     }
 
-    /* Custom styling for checkboxes */
     .task-checkbox {
         margin-right: 0.75rem;
-        appearance: none; /* Hide default checkbox */
+        appearance: none;
         width: 1.25rem;
         height: 1.25rem;
         border: 2px solid var(--primary);
-        border-radius: 0.375rem; /* rounded-md */
+        border-radius: 0.375rem;
         background-color: transparent;
         transition: all 0.2s ease;
         position: relative;
         cursor: pointer;
     }
 
-    /* Checked state for custom checkboxes */
     .task-checkbox:checked {
         background-color: var(--primary);
         border-color: var(--primary);
     }
 
-    /* Checkmark inside the custom checkbox when checked */
     .task-checkbox:checked::before {
-        content: '\2713'; /* Unicode checkmark character */
+        content: '\2713';
         display: block;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 0.875rem; /* text-sm */
-        color: var(--bg-dark); /* Dark color for contrast */
+        font-size: 0.875rem;
+        color: var(--bg-dark);
         font-weight: bold;
     }
 
-    /* Focus state for accessibility */
     .task-checkbox:focus {
         outline: none;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); /* Blue glow on focus */
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5);
     }
 
-    /* Responsive adjustments for floating clock on smaller screens */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--card-dark);
+      color: var(--text-primary);
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-left: 4px solid var(--primary);
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--primary);
+    }
+    
+    .notification-close {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    
+    .pushover-section {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .pushover-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    label {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    input {
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--card-border);
+      background: rgba(2, 6, 23, 0.5);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .btn {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: var(--bg-dark);
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn i {
+      font-size: 1rem;
+    }
+    
+    .btn-success {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
     @media (max-width: 1024px) {
       .floating-clock {
         top: auto;
@@ -214,30 +296,36 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
-  <!-- Floating Clock displays current time -->
+  <!-- Floating Clock -->
   <div class="floating-clock">
     <i class="fas fa-clock"></i>
     <span id="live-clock" class="clock-time">00:00:00</span>
   </div>
   
-  <!-- Main content area with max width and horizontal padding -->
+  <!-- Notification Container -->
+  <div id="notification" class="notification">
+    <button class="notification-close">&times;</button>
+    <div class="notification-title" id="notification-title">Notification</div>
+    <div id="notification-message">Message content goes here</div>
+  </div>
+  
+  <!-- Main content area -->
   <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
     <header class="text-center mb-10">
-      <!-- Main title of the schedule -->
       <h1 class="text-4xl md:text-5xl font-extrabold mb-4 glow-text">
         <span class="bg-gradient-to-r from-sky-400 to-purple-500 bg-clip-text text-transparent">
-          Daniel's Summer Development Plan
+          Daniel's Summer Schedule
         </span>
       </h1>
-      <!-- Schedule date range -->
       <p class="text-slate-400 text-lg">
         <i class="fas fa-calendar mr-2"></i>June 10 – Sept 10, 2025
       </p>
     </header>
 
-    <!-- Today's Focus Section (New) - centralizes current day's info -->
+  
+
+    <!-- Today's Focus Section -->
     <section class="bg-card-dark rounded-xl p-6 mb-8 border border-card-border shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between">
-      <!-- Current Day and Date -->
       <div class="mb-4 lg:mb-0 lg:w-1/3">
         <h2 class="text-3xl font-bold text-sky-400 mb-2 flex items-center gap-3">
           <i class="fas fa-calendar-day text-purple-400"></i>
@@ -249,7 +337,6 @@
         </p>
       </div>
 
-      <!-- Current Task and Progress -->
       <div class="lg:w-1/3 mb-4 lg:mb-0">
         <h3 class="text-xl font-semibold text-slate-200 mb-2 flex items-center gap-2">
           <i class="fas fa-hourglass-half text-orange-400"></i>
@@ -263,20 +350,18 @@
         </div>
       </div>
 
-      <!-- Upcoming Tasks -->
       <div class="lg:w-1/3">
         <h3 class="text-xl font-semibold text-slate-200 mb-2 flex items-center gap-2">
           <i class="fas fa-tasks text-green-400"></i>
           Upcoming Tasks:
         </h3>
         <ul id="today-focus-upcoming-tasks" class="space-y-1 ml-6 text-slate-300 text-base">
-          <!-- Upcoming tasks will be loaded here by JS -->
           <li>No upcoming tasks.</li>
         </ul>
       </div>
     </section>
 
-    <!-- Missed Hours Summary (New) - displays analysis of forgotten study time -->
+    <!-- Missed Hours Summary -->
     <section class="bg-card-dark rounded-xl p-6 mb-8 border border-card-border shadow-lg text-center">
       <h2 class="text-2xl font-bold text-red-400 mb-3 flex items-center justify-center gap-3">
         <i class="fas fa-stopwatch text-red-500"></i>
@@ -357,6 +442,32 @@
         <ul class="space-y-4" id="sunday-tasks"></ul>
       </div>
     </section>
+
+    <br>
+     <!-- Pushover Configuration -->
+     <section class="pushover-section">
+      <h2 class="text-2xl font-bold text-sky-400 mb-4 flex items-center gap-3">
+        <i class="fas fa-bell text-yellow-400"></i>
+        Pushover Notifications
+      </h2>
+      <div class="pushover-form">
+        <div class="form-group">
+          <label for="pushover-user">User Key:</label>
+          <input type="text" id="pushover-user" placeholder="Enter your Pushover User Key" value="u5cz4j61ut3qz3ehbh4gzo9dnwg423">
+        </div>
+        <div class="form-group">
+          <label for="pushover-token">API Token:</label>
+          <input type="text" id="pushover-token" placeholder="Enter your Pushover API Token" value="acdwyq6voywdmw2dt1dnu4jgjui7jr">
+        </div>
+        <button id="save-pushover" class="btn">
+          <i class="fas fa-save"></i> Save Configuration
+        </button>
+        <button id="test-notification" class="btn btn-success">
+          <i class="fas fa-paper-plane"></i> Send Test Notification
+        </button>
+      </div>
+    </section>
+
   </main>
 
   <!-- Page Footer -->
@@ -369,7 +480,71 @@
   </footer>
 
   <script>
-    // Schedule Data - now includes a 'day' property for easier mapping and 'duration' for calculations
+    // Pushover Configuration
+    const PUSHOVER_API_URL = 'https://api.pushover.net/1/messages.json';
+    let pushoverUserKey = 'u5cz4j61ut3qz3ehbh4gzo9dnwg423';
+    let pushoverApiToken = 'acdwyq6voywdmw2dt1dnu4jgjui7jr';
+    let lastNotifiedTaskId = null;
+    
+    // Notification System
+    const notification = {
+      element: document.getElementById('notification'),
+      title: document.getElementById('notification-title'),
+      message: document.getElementById('notification-message'),
+      closeBtn: document.querySelector('.notification-close'),
+      
+      init: function() {
+        this.closeBtn.addEventListener('click', () => this.hide());
+      },
+      
+      show: function(title, message, duration = 5000) {
+        this.title.textContent = title;
+        this.message.textContent = message;
+        this.element.classList.add('show');
+        
+        if (duration > 0) {
+          setTimeout(() => this.hide(), duration);
+        }
+      },
+      
+      hide: function() {
+        this.element.classList.remove('show');
+      }
+    };
+    
+    // Pushover Notification Function
+    async function sendPushoverNotification(title, message) {
+      try {
+        const formData = new FormData();
+        formData.append('token', pushoverApiToken);
+        formData.append('user', pushoverUserKey);
+        formData.append('title', title);
+        formData.append('message', message);
+        formData.append('sound', 'cosmic');
+        
+        const response = await fetch(PUSHOVER_API_URL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 1) {
+          notification.show('Notification Sent', 'Mobile notification has been delivered!');
+          return true;
+        } else {
+          notification.show('Error', `Failed to send notification: ${result.errors?.join(', ') || 'Unknown error'}`);
+          return false;
+        }
+      } catch (error) {
+        notification.show('Error', `Failed to send notification: ${error.message}`);
+        return false;
+      }
+    }
+
+    
+
+    // Schedule Data
     const scheduleData = {
       Monday: [
         { day: "Monday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-mon-0" },
@@ -380,7 +555,7 @@
         { day: "Monday", start: "16:00", end: "18:00", task: "Practice: CSS/JS", duration: 120, id: "task-mon-5" },
         { day: "Monday", start: "18:00", end: "19:00", task: "Dinner", duration: 60, id: "task-mon-6" },
         { day: "Monday", start: "19:00", end: "21:00", task: "Coursera (Frontend Module)", duration: 120, id: "task-mon-7" },
-        { day: "Monday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-mon-8" }, // Adjusted end to 23:59 for duration calculation
+        { day: "Monday", start: "21:00", end: "23:59", task: "Free time", duration: 179, id: "task-mon-8" },
       ],
       Tuesday: [
         { day: "Tuesday", start: "09:00", end: "10:30", task: "Morning routine", duration: 90, id: "task-tue-0" },
@@ -435,98 +610,89 @@
         { day: "Saturday", start: "18:00", end: "23:59", task: "Free time / Social", duration: 359, id: "task-sat-5" },
       ],
       Sunday: [
-        { day: "Sunday", start: "00:00", end: "12:59", task: "Rest & Recharge", duration: 779, id: "task-sun-0" }, // Covers early morning to just before next task
+        { day: "Sunday", start: "00:00", end: "12:59", task: "Rest & Recharge", duration: 779, id: "task-sun-0" },
         { day: "Sunday", start: "13:00", end: "17:00", task: "Plan for Next Week", duration: 240, id: "task-sun-1" },
         { day: "Sunday", start: "17:01", end: "20:59", task: "Relaxing Activities / Hobbies", duration: 238, id: "task-sun-2" },
         { day: "Sunday", start: "21:00", end: "22:00", task: "Prepare for Monday", duration: 60, id: "task-sun-3" },
-        { day: "Sunday", start: "22:01", end: "23:59", task: "Rest & Recharge", duration: 118, id: "task-sun-4" } // Covers remaining time
+        { day: "Sunday", start: "22:01", end: "23:59", task: "Rest & Recharge", duration: 118, id: "task-sun-4" }
       ],
     };
 
+    // Initialize notification system
+    notification.init();
+
     // DOM Elements
-    const liveClock = document.getElementById('live-clock');
-    
-    // Today's Focus Section Elements
+    const liveClockEl = document.getElementById('live-clock');
     const todayFocusDayEl = document.getElementById('today-focus-day');
     const todayFocusDateEl = document.getElementById('today-focus-date');
     const todayFocusTimeEl = document.getElementById('today-focus-time');
     const todayFocusCurrentTaskEl = document.getElementById('today-focus-current-task');
     const todayFocusProgressFill = document.getElementById('today-focus-progress-fill');
     const todayFocusUpcomingTasksEl = document.getElementById('today-focus-upcoming-tasks');
-
-    // Missed Hours Elements
     const missedHoursSummaryEl = document.getElementById('missed-hours-summary');
     const missedHoursImpactEl = document.getElementById('missed-hours-impact');
+    const savePushoverBtn = document.getElementById('save-pushover');
+    const testNotificationBtn = document.getElementById('test-notification');
+    
+    let currentlyHighlighted = null;
 
-    let currentlyHighlighted = null; // Stores the ID of the currently highlighted task element in the main schedule view
+    // Save Pushover configuration
+    savePushoverBtn.addEventListener('click', () => {
+      pushoverUserKey = document.getElementById('pushover-user').value;
+      pushoverApiToken = document.getElementById('pushover-token').value;
+      
+      localStorage.setItem('pushoverUserKey', pushoverUserKey);
+      localStorage.setItem('pushoverApiToken', pushoverApiToken);
+      
+      notification.show('Configuration Saved', 'Pushover settings have been updated successfully!');
+    });
 
-    /**
-     * Converts a time string (e.g., "09:00") to minutes since midnight.
-     * @param {string} timeStr - The time string in "HH:MM" format.
-     * @returns {number} The total minutes from midnight.
-     */
+    // Test notification
+    testNotificationBtn.addEventListener('click', async () => {
+      notification.show('Sending Test', 'Sending test notification to your mobile...');
+      const success = await sendPushoverNotification(
+        'Schedule Notification Test',
+        'This is a test notification from your summer schedule app!'
+      );
+    });
+
     function timeToMinutes(timeStr) {
       const [hours, minutes] = timeStr.split(':').map(Number);
       return hours * 60 + minutes;
     }
 
-    /**
-     * Updates the live clock display in the floating clock and today's focus section.
-     */
     function updateLiveClock() {
       const now = new Date();
       const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      liveClock.textContent = timeString;
-      todayFocusTimeEl.textContent = timeString; // Also update in today's focus section
+      liveClockEl.textContent = timeString;
+      todayFocusTimeEl.textContent = timeString;
     }
 
-    /**
-     * Saves the completion status of a task to localStorage.
-     * After saving, it triggers an update of the missed hours summary.
-     * @param {string} taskId - The ID of the task.
-     * @param {boolean} isCompleted - True if the task is completed, false otherwise.
-     */
     function saveTaskCompletion(taskId, isCompleted) {
       const completionStatus = JSON.parse(localStorage.getItem('taskCompletion') || '{}');
       completionStatus[taskId] = isCompleted;
       localStorage.setItem('taskCompletion', JSON.stringify(completionStatus));
-      updateMissedHoursSummary(); // Recalculate and update summary after change
+      updateMissedHoursSummary();
     }
 
-    /**
-     * Loads the completion status of a task from localStorage.
-     * @param {string} taskId - The ID of the task.
-     * @returns {boolean} True if the task is completed, false by default.
-     */
     function loadTaskCompletion(taskId) {
       const completionStatus = JSON.parse(localStorage.getItem('taskCompletion') || '{}');
       return completionStatus[taskId] || false;
     }
 
-    /**
-     * Renders tasks for a given day into the appropriate UL element,
-     * including checkboxes and their initial states (completed/not completed).
-     * @param {string} dayName - The name of the day (e.g., "Monday").
-     * @param {Array<Object>} tasks - An array of task objects for the day.
-     */
     function renderTasksForDay(dayName, tasks) {
       const ulElement = document.getElementById(`${dayName.toLowerCase()}-tasks`);
-      if (!ulElement) {
-        console.error(`UL element for ${dayName} not found.`);
-        return;
-      }
+      if (!ulElement) return;
 
-      ulElement.innerHTML = ''; // Clear existing tasks before rendering
+      ulElement.innerHTML = '';
 
       tasks.forEach(task => {
         const isCompleted = loadTaskCompletion(task.id);
 
         const li = document.createElement('li');
-        li.id = task.id; // Assign ID to the list item for highlighting
-        // Apply 'task-completed' class if the task is marked as done
+        li.id = task.id;
         li.className = `p-2 rounded-lg flex items-start gap-2 ${isCompleted ? 'task-completed' : ''}`;
 
-        // Construct the inner HTML for each task item with a checkbox
         li.innerHTML = `
           <input type="checkbox" class="task-checkbox mt-1" id="checkbox-${task.id}" ${isCompleted ? 'checked' : ''}>
           <div class="flex-1">
@@ -540,13 +706,10 @@
         
         ulElement.appendChild(li);
 
-        // Add event listener to the newly created checkbox
         const checkbox = document.getElementById(`checkbox-${task.id}`);
         if (checkbox) {
             checkbox.addEventListener('change', (event) => {
-                // Save the new completion status and update the UI
                 saveTaskCompletion(task.id, event.target.checked);
-                // Toggle 'task-completed' class on the parent li element
                 if (event.target.checked) {
                     li.classList.add('task-completed');
                 } else {
@@ -557,35 +720,20 @@
       });
     }
 
-    /**
-     * Calculates the total missed study hours based on unchecked tasks that have already passed.
-     * Filters out tasks explicitly marked as "Free time" or "Leisure".
-     * @returns {number} The total missed minutes from past or currently elapsed tasks.
-     */
     function calculateMissedHours() {
       let missedMinutes = 0;
       const now = new Date();
       const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      const currentDayIndex = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+      const currentDayIndex = now.getDay();
       const currentMinutesOfDay = now.getHours() * 60 + now.getMinutes();
 
-      console.log(`--- Calculating Missed Hours (Current Time: ${now.toLocaleTimeString()}) ---`);
-      console.log(`Current Day Index: ${currentDayIndex} (${dayNames[currentDayIndex]})`);
-      console.log(`Current Minutes of Day: ${currentMinutesOfDay}`);
-
-      // Iterate through each day in the scheduleData
       for (let i = 0; i < dayNames.length; i++) {
         const dayName = dayNames[i];
         const dayTasks = scheduleData[dayName];
-        
-        if (!dayTasks) continue; // Skip if no tasks for this day
+        if (!dayTasks) continue;
 
-        console.log(`Checking tasks for ${dayName}:`);
-
-        // Case 1: Past days (any task not completed is missed)
         if (i < currentDayIndex) {
           dayTasks.forEach(task => {
-            // Exclude non-study tasks and tasks without duration
             if (task.task.toLowerCase().includes("free time") || 
                 task.task.toLowerCase().includes("leisure") || 
                 task.duration === undefined) {
@@ -594,19 +742,12 @@
             const isCompleted = loadTaskCompletion(task.id);
             if (!isCompleted) {
               missedMinutes += task.duration;
-              console.log(`  - MISSED (Past Day): ${task.task} (${task.duration} min). ID: ${task.id}, Completed: ${isCompleted}`);
-            } else {
-              console.log(`  - COMPLETED (Past Day): ${task.task}. ID: ${task.id}, Completed: ${isCompleted}`);
             }
           });
-        } 
-        // Case 2: Current day (only tasks whose end time has passed and are not completed are missed)
-        else if (i === currentDayIndex) {
+        } else if (i === currentDayIndex) {
           dayTasks.forEach(task => {
             const taskEndMinutes = timeToMinutes(task.end);
-            // Only consider tasks that have already ended on the current day
             if (taskEndMinutes <= currentMinutesOfDay) {
-              // Exclude non-study tasks and tasks without duration
               if (task.task.toLowerCase().includes("free time") || 
                   task.task.toLowerCase().includes("leisure") || 
                   task.duration === undefined) {
@@ -615,30 +756,14 @@
               const isCompleted = loadTaskCompletion(task.id);
               if (!isCompleted) {
                 missedMinutes += task.duration;
-                console.log(`  - MISSED (Current Day, Passed): ${task.task} (${task.duration} min). ID: ${task.id}, Completed: ${isCompleted}`);
-              } else {
-                console.log(`  - COMPLETED (Current Day, Passed): ${task.task}. ID: ${task.id}, Completed: ${isCompleted}`);
               }
-            } else {
-                // Task is on current day but has not yet passed its end time
-                console.log(`  - UPCOMING (Current Day, Future): ${task.task} (Not counted). End Time: ${task.end}`);
             }
           });
         }
-        // Case 3: Future days (no tasks from future days are considered missed)
-        else if (i > currentDayIndex) {
-            console.log(`  - FUTURE DAY: ${dayName} (Tasks not counted as missed yet).`);
-        }
       }
-      console.log(`Total Missed Minutes: ${missedMinutes}`);
-      console.log(`--- End Missed Hours Calculation ---`);
       return missedMinutes;
     }
 
-    /**
-     * Updates the "Missed Study Time Analysis" section with the calculated missed hours
-     * and a personalized message about their potential impact.
-     */
     function updateMissedHoursSummary() {
       const totalMissedMinutes = calculateMissedHours();
       const missedHours = Math.floor(totalMissedMinutes / 60);
@@ -646,15 +771,14 @@
 
       if (totalMissedMinutes === 0) {
         missedHoursSummaryEl.textContent = "You haven't missed any study time! Keep up the great work.";
-        missedHoursImpactEl.textContent = ""; // Clear impact message if no hours missed
+        missedHoursImpactEl.textContent = "";
       } else {
         let timeString = '';
-        // Format the time string nicely (e.g., "2 hours and 30 minutes")
         if (missedHours > 0) {
             timeString += `${missedHours} hour${missedHours > 1 ? 's' : ''}`;
         }
         if (remainingMinutes > 0) {
-            if (timeString) timeString += ' and '; // Add "and" if both hours and minutes exist
+            if (timeString) timeString += ' and ';
             timeString += `${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}`;
         }
         
@@ -665,16 +789,11 @@
       }
     }
 
-    /**
-     * Main function to update the current task, progress bar, and "Today's Focus" section.
-     * It also highlights the current task in the main schedule view.
-     */
-    function updateCurrentTaskAndFocus() {
+    async function updateCurrentTaskAndFocus() {
       const now = new Date();
       const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       const currentDayName = dayNames[now.getDay()];
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      // Format the date for display (e.g., "Monday, June 10")
       const dateString = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
       let activeTask = null;
@@ -684,36 +803,41 @@
       let taskEnd = 0;
       let upcomingTasks = [];
 
-      // Update Today's Focus Section with current day and date
       todayFocusDayEl.textContent = currentDayName;
       todayFocusDateEl.textContent = dateString;
       
       const tasksToday = scheduleData[currentDayName];
       if (tasksToday) {
-        // Iterate through tasks for the current day to find the active task and upcoming tasks
         for (let i = 0; i < tasksToday.length; i++) {
           const task = tasksToday[i];
           const taskStartMinutes = timeToMinutes(task.start);
           const taskEndMinutes = timeToMinutes(task.end);
           
           if (currentMinutes >= taskStartMinutes && currentMinutes < taskEndMinutes) {
-            // Found the active task
             activeTask = task;
             activeTaskName = task.task;
             taskStart = taskStartMinutes;
             taskEnd = taskEndMinutes;
-            // Calculate progress within the current task
             taskProgress = Math.min(100, Math.max(0, ((currentMinutes - taskStart) / (taskEnd - taskStart)) * 100));
             
-            // Collect next 3 upcoming tasks (excluding free time/leisure)
+            // Send notification for new task
+            if (lastNotifiedTaskId !== task.id) {
+              lastNotifiedTaskId = task.id;
+              
+              // Send Pushover notification
+              await sendPushoverNotification(
+                `Time for: ${task.task}`,
+                `From ${task.start} to ${task.end}`
+              );
+            }
+            
             for (let j = i + 1; j < tasksToday.length && upcomingTasks.length < 3; j++) {
                 if (!tasksToday[j].task.toLowerCase().includes("free time") && !tasksToday[j].task.toLowerCase().includes("leisure")) {
                     upcomingTasks.push(tasksToday[j]);
                 }
             }
-            break; // Stop iterating once active task is found and upcoming tasks are collected
+            break;
           } else if (currentMinutes < taskStartMinutes) {
-            // If no active task yet, but we are before the current task, consider it and subsequent ones as upcoming
             if (activeTask === null) {
                 for (let j = i; j < tasksToday.length && upcomingTasks.length < 3; j++) {
                     if (!tasksToday[j].task.toLowerCase().includes("free time") && !tasksToday[j].task.toLowerCase().includes("leisure")) {
@@ -721,16 +845,14 @@
                     }
                 }
             }
-            break; // No need to check further if we are before any tasks today
+            break;
           }
         }
       }
 
-      // Update current task display and progress bar in Today's Focus
       todayFocusCurrentTaskEl.textContent = activeTaskName;
       todayFocusProgressFill.style.width = `${taskProgress}%`;
 
-      // Populate upcoming tasks list
       todayFocusUpcomingTasksEl.innerHTML = '';
       if (upcomingTasks.length > 0) {
         upcomingTasks.forEach(task => {
@@ -744,7 +866,6 @@
         todayFocusUpcomingTasksEl.appendChild(li);
       }
 
-      // Remove highlight from previously highlighted task in the main schedule view
       if (currentlyHighlighted) {
         const prevTaskElement = document.getElementById(currentlyHighlighted);
         if (prevTaskElement) {
@@ -752,7 +873,6 @@
         }
       }
 
-      // Add highlight to the current active task in the main schedule view
       if (activeTask && activeTask.id) {
         const currentTaskElement = document.getElementById(activeTask.id);
         if (currentTaskElement) {
@@ -766,31 +886,41 @@
       }
     }
 
-    /**
-     * Initializes the schedule by rendering tasks for all days and setting up initial states.
-     */
     function initializeSchedule() {
         for (const day in scheduleData) {
             renderTasksForDay(day, scheduleData[day]);
         }
-        updateMissedHoursSummary(); // Perform initial calculation and display of missed hours
+        updateMissedHoursSummary();
     }
 
     // Event listener for when the DOM is fully loaded
     document.addEventListener('DOMContentLoaded', () => {
-        initializeSchedule(); // Render tasks and set up checkboxes
-        updateLiveClock(); // Initial display of the live clock
-        updateCurrentTaskAndFocus(); // Initial update of current task and focus section
+      // Load saved Pushover settings
+      const savedUserKey = localStorage.getItem('pushoverUserKey');
+      const savedApiToken = localStorage.getItem('pushoverApiToken');
+      
+      if (savedUserKey) {
+        document.getElementById('pushover-user').value = savedUserKey;
+        pushoverUserKey = savedUserKey;
+      }
+      
+      if (savedApiToken) {
+        document.getElementById('pushover-token').value = savedApiToken;
+        pushoverApiToken = savedApiToken;
+      }
+      
+      initializeSchedule();
+      updateLiveClock();
+      updateCurrentTaskAndFocus();
 
-        // Set intervals for continuous updates
-        setInterval(updateCurrentTaskAndFocus, 1000); // Update current task and focus every second
-        setInterval(updateLiveClock, 1000); // Update live clock every second (can be optimized if needed)
+      setInterval(updateCurrentTaskAndFocus, 1000);
+      setInterval(updateLiveClock, 1000);
     });
     
-    // Animate day cards on page load for a smooth entry effect
+    // Animate day cards on page load
     document.querySelectorAll('.day-card').forEach((card, index) => {
       card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
-      card.style.opacity = '0'; /* Start with opacity 0 for fadeIn animation */
+      card.style.opacity = '0';
     });
   </script>
 </body>
